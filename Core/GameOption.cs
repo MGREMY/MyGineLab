@@ -37,16 +37,6 @@ public record GraphicOption
         }
     } = false;
 
-    public float MaxFps
-    {
-        get;
-        set
-        {
-            HasChanged = true;
-            field = value;
-        }
-    } = 60;
-
     public void ApplyChanges(object? sender)
     {
         if (HasChanged) OnGraphicOptionChanged?.Invoke(sender, this);
@@ -82,6 +72,16 @@ public record GameOption
             field = value;
         }
     } = true;
+
+    public float TargetTps
+    {
+        get;
+        set
+        {
+            HasChanged = true;
+            field = value;
+        }
+    } = 30;
 
     public GraphicOption GraphicOption
     {

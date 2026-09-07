@@ -1,8 +1,13 @@
 using System.IO;
-using System.Linq;
 using Core;
+using FirstGame.Ecs.Components;
+using FirstGame.Ecs.Systems;
+using FirstGame.GameObjects;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
+using MonoGame.Extended.ECS;
+using MonoGame.Extended.Graphics;
 using MonoGame.Extended.Tilemaps;
 using MonoGame.Extended.Tilemaps.Rendering;
 using MonoGame.Extended.ViewportAdapters;
@@ -11,28 +16,13 @@ namespace FirstGame.Screens;
 
 public class GameplayScreen : BaseScreen
 {
-    private TilemapWorld _world = null!;
-    private Tilemap _tilemap = null!;
+    private readonly TilemapSpriteBatchRenderer _renderer = new();
     private OrthographicCamera _camera = null!;
-    private TilemapSpriteBatchRenderer _renderer = null!;
-    private Vector2 _spawnPoint = Vector2.Zero;
+    private World _ecsWorld = null!;
+    private GameWorld _gameWorld = null!;
 
     public GameplayScreen(BaseGame game) : base(game)
     {
-    }
-
-    public override void LoadContent()
-    {
-        base.LoadContent();
-
-        _renderer = new TilemapSpriteBatchRenderer();
-
-        _world = Content.Load<TilemapWorld>(Path.Combine("map", "world"));
-        _tilemap = _world.Levels[0];
-        _renderer.LoadTilemap(_tilemap);
-
-        _spawnPoint = (_tilemap.Layers["PlayerEntities"] as TilemapObjectLayer)?
-            .Objects.First(x => x.Name is "SpawnPoint").Position ?? Vector2.Zero;
     }
 
     public override void Initialize()
@@ -42,29 +32,60 @@ public class GameplayScreen : BaseScreen
         var viewportAdapter = new BoxingViewportAdapter(
             Window,
             GraphicsDevice,
-            GraphicsDevice.PresentationParameters.BackBufferWidth,
-            GraphicsDevice.PresentationParameters.BackBufferHeight);
+            640,
+            320);
         _camera = new OrthographicCamera(viewportAdapter);
+    }
+
+    public override void LoadContent()
+    {
+        base.LoadContent();
+
+        var tilemapWorld = Content.Load<TilemapWorld>(Path.Combine("map", "world"));
+
+        _gameWorld = GameWorld.FromTilemapWorld(tilemapWorld);
+
+        _renderer.LoadTilemap(_gameWorld.CurrentGameLevel.Tilemap);
+
+        _camera.EnableWorldBounds(_gameWorld.CurrentGameLevel.Tilemap.WorldBounds);
+        _camera.IsZoomClampedToWorldBounds = true;
+
+        _ecsWorld = new WorldBuilder()
+            .AddSystem(new InputSystem())
+            //.AddSystem(new GravitySystem())
+            .AddSystem(new MovementSystem())
+            .AddSystem(new CameraSystem(_camera))
+            .AddSystem(new RenderSystem(SpriteBatch, _camera))
+            .Build();
+
+        CreateEcsEntities();
     }
 
     public override void Update(GameTime gameTime)
     {
-        _renderer.Update(gameTime);
-        _camera.LookAt(_spawnPoint);
+        _ecsWorld.Update(gameTime);
     }
 
     public override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(_tilemap.BackgroundColor ?? Color.Black);
+        GraphicsDevice.Clear(_gameWorld.CurrentGameLevel.Tilemap.BackgroundColor ?? Color.Black);
 
         _renderer.Draw(SpriteBatch, _camera);
+        _ecsWorld.Draw(gameTime);
+    }
 
-        SpriteBatch.Begin(transformMatrix: _camera.GetViewMatrix());
-        
-        SpriteBatch.DrawRectangle(
-            new RectangleF(_spawnPoint.X, _spawnPoint.Y, 16, 16),
-            Color.White);
+    private void CreateEcsEntities()
+    {
+        var texture = new Texture2D(GraphicsDevice, 16, 16);
+        var data = new Color[16 * 16];
+        for (var i = 0; i < data.Length; i++)
+            data[i] = Color.White;
+        texture.SetData(data);
 
-        SpriteBatch.End();
+        var player = _ecsWorld.CreateEntity();
+        player.Attach(new Transform2(_gameWorld.CurrentGameLevel.Data.SpawnPoint));
+        player.Attach(new Velocity());
+        player.Attach(new Sprite(texture));
+        player.Attach(new CameraTarget());
     }
 }

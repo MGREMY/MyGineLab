@@ -59,6 +59,8 @@ public class BaseGame : Game
     {
         GameOption = e;
 
+        //IsFixedTimeStep = true;
+        //TargetElapsedTime = TimeSpan.FromSeconds((float)1 / e.TargetTps);
         IsMouseVisible = e.IsMouseVisible;
     }
 
@@ -66,12 +68,10 @@ public class BaseGame : Game
     {
         GameOption.GraphicOption = e;
 
-        IsFixedTimeStep = true;
-        Graphics.SynchronizeWithVerticalRetrace = false;
+        Graphics.SynchronizeWithVerticalRetrace = true;
         Graphics.PreferredBackBufferWidth = e.Width;
         Graphics.PreferredBackBufferHeight = e.Height;
         Graphics.IsFullScreen = e.IsFullScreen;
-        TargetElapsedTime = TimeSpan.FromSeconds((float)1 / e.MaxFps);
 
         Graphics.ApplyChanges();
     }

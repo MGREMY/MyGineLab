@@ -11,7 +11,7 @@
 	"iid": "16cbdef0-96d0-11f1-afda-a9ef1063878e",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 53,
+	"nextUid": 54,
 	"identifierStyle": "Capitalize",
 	"toc": [{
 		"identifier": "SpawnPoint",
@@ -20,8 +20,8 @@
 			"worldIid": "16cc2d10-96d0-11f1-afda-9722ed656877",
 			"levelIid": "16ccc950-96d0-11f1-afda-ebd424fb13aa",
 			"layerIid": "20ae6e00-96d0-11f1-afda-21c6ce8daf97",
-			"entityIid": "39afa4f0-96d0-11f1-afda-e540ee4cdbce"
-		}, "worldX": 112, "worldY": 96, "widPx": 16, "heiPx": 16, "fields" : {} }]
+			"entityIid": "eb54d2f0-96d0-11f1-be58-3391d8a952cf"
+		}, "worldX": 16, "worldY": 704, "widPx": 16, "heiPx": 16, "fields" : {} }]
 	}],
 	"worldLayout": "Free",
 	"worldGridWidth": 256,
@@ -52,7 +52,7 @@
 	"defs": { "layers": [
 		{
 			"__type": "Entities",
-			"identifier": "PlayerEntities",
+			"identifier": "MapData",
 			"type": "Entities",
 			"uid": 52,
 			"doc": null,
@@ -1706,8 +1706,8 @@
 			"worldX": 0,
 			"worldY": 0,
 			"worldDepth": 0,
-			"pxWid": 256,
-			"pxHei": 256,
+			"pxWid": 1024,
+			"pxHei": 768,
 			"__bgColor": "#696A79",
 			"bgColor": null,
 			"useAutoIdentifier": true,
