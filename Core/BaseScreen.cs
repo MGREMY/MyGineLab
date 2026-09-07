@@ -1,3 +1,4 @@
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Screens;
 
@@ -7,4 +8,5 @@ public abstract class BaseScreen(BaseGame game) : GameScreen(game)
 {
     protected GameOption GameOption => game.GameOption;
     protected SpriteBatch SpriteBatch => game.SpriteBatch;
+    protected GameWindow Window => game.Window;
 }

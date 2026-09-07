@@ -13,6 +13,9 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <ApplicationIcon>Icon.ico</ApplicationIcon>
     </PropertyGroup>
+    <PropertyGroup>
+        <MonoGameExtendedPipelineReferencePath>$(MSBuildThisFileDirectory)pipeline-references</MonoGameExtendedPipelineReferencePath>
+    </PropertyGroup>
     <ItemGroup>
         <None Remove="Icon.ico"/>
         <None Remove="Icon.bmp"/>
@@ -26,6 +29,7 @@
         </EmbeddedResource>
     </ItemGroup>
     <ItemGroup>
+        <PackageReference Include="MonoGame.Extended.Content.Pipeline" Version="6.1.1" />
         <PackageReference Include="MonoGame.Framework.Native" Version="3.8.5.1"/>
         <PackageReference Include="MonoGame.Runtime.Windows.Vulkan" Version="3.8.5.1"/>
         <PackageReference Include="MonoGame.Runtime.Mac.Vulkan" Version="3.8.5.1"/>
@@ -36,7 +40,6 @@
       <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="Content\maps\" />
       <Folder Include="Content\map\" />
       <Folder Include="Content\texture\" />
     </ItemGroup>
