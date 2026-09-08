@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
+using MonoGame.Extended.Collisions;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
 using MonoGame.Extended.Graphics;

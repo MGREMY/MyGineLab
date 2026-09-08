@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.Tilemaps;
-using MonoGame.Extended.Tilemaps.Rendering;
 
 namespace FirstGame.GameObjects;
 
@@ -36,6 +35,5 @@ public class GameLevel
         {
             SpawnPoint = mapData.Objects.First(x => x.Name is "SpawnPoint").Position,
         };
-        ;
     }
 }

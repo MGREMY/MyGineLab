@@ -1,8 +1,6 @@
-using System.Linq;
-using Core.Input;
+using System;
 using FirstGame.Ecs.Components;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
@@ -11,7 +9,7 @@ namespace FirstGame.Ecs.Systems;
 
 public class MovementSystem() : EntityUpdateSystem(Aspect.All(typeof(Transform2), typeof(Velocity)))
 {
-    private const float DecelerationFactor = 2.5f;
+    private const float MovementSpeed = 1200f; // 600 PX/s
 
     private ComponentMapper<Transform2> _transformMapper = null!;
     private ComponentMapper<Velocity> _velocityMapper = null!;
@@ -31,14 +29,23 @@ public class MovementSystem() : EntityUpdateSystem(Aspect.All(typeof(Transform2)
             var transform = _transformMapper.Get(entityId);
             var velocity = _velocityMapper.Get(entityId);
 
+            velocity.Value = MoveTowards(velocity.Value, velocity.Target, MovementSpeed * deltaTime);
             transform.Position += velocity.Value * deltaTime;
 
-            if (InputManager.Instance.Keyboard.CurrentState.GetPressedKeys()
-                .Any(x => x is Keys.Z or Keys.Q or Keys.S or Keys.D)) continue;
-
-            velocity.Value -= velocity.Value * DecelerationFactor * deltaTime;
-
-            if (velocity.Value.LengthSquared() <= 5f) velocity.Value = Vector2.Zero;
+            if (Math.Abs(velocity.Value.X) <= 1f) velocity.Target.X = 0;
+            if (Math.Abs(velocity.Value.Y) <= 1f) velocity.Target.Y = 0;
         }
+    }
+
+    private Vector2 MoveTowards(Vector2 current, Vector2 target, float amount)
+    {
+        return new Vector2(MoveTowards(current.X, target.X, amount), MoveTowards(current.Y, target.Y, amount));
+    }
+
+    private float MoveTowards(float current, float target, float amount)
+    {
+        if (Math.Abs(target - current) <= amount) return target;
+
+        return current + Math.Sign(target - current) * amount;
     }
 }

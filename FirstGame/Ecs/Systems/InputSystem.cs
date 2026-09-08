@@ -1,3 +1,4 @@
+using System;
 using Core.Input;
 using FirstGame.Ecs.Components;
 using Microsoft.Xna.Framework;
@@ -9,8 +10,9 @@ namespace FirstGame.Ecs.Systems;
 
 public class InputSystem() : EntityUpdateSystem(Aspect.All(typeof(Velocity)))
 {
-    private const float Acceleration = 300f;
+    private const float Speed = 300f; // 300 PX/s
 
+    private readonly Vector2 _speedVector = new(Speed);
     private ComponentMapper<Velocity> _velocityMapper = null!;
 
     public override void Initialize(IComponentMapperService mapperService)
@@ -20,16 +22,24 @@ public class InputSystem() : EntityUpdateSystem(Aspect.All(typeof(Velocity)))
 
     public override void Update(GameTime gameTime)
     {
-        var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
         foreach (var entityId in ActiveEntities)
         {
             var velocity = _velocityMapper.Get(entityId);
+            var newVelocityTarget = new Vector2(0.0f, velocity.Value.Y);
 
-            if (InputManager.Instance.Keyboard.IsKeyDown(Keys.Z)) velocity.Value.Y -= Acceleration * deltaTime;
-            if (InputManager.Instance.Keyboard.IsKeyDown(Keys.S)) velocity.Value.Y += Acceleration * deltaTime;
-            if (InputManager.Instance.Keyboard.IsKeyDown(Keys.Q)) velocity.Value.X -= Acceleration * deltaTime;
-            if (InputManager.Instance.Keyboard.IsKeyDown(Keys.D)) velocity.Value.X += Acceleration * deltaTime;
+            if (InputManager.Instance.Keyboard.IsKeyDown(Keys.Space))
+            {
+                if (velocity.CanGoUp)
+                {
+                    velocity.CanGoUp = false;
+                    velocity.Value.Y -= _speedVector.Y;
+                }
+            }
+
+            if (InputManager.Instance.Keyboard.IsKeyDown(Keys.Q)) newVelocityTarget.X -= _speedVector.X;
+            if (InputManager.Instance.Keyboard.IsKeyDown(Keys.D)) newVelocityTarget.X += _speedVector.X;
+            
+            velocity.Target = newVelocityTarget;
         }
     }
 }
