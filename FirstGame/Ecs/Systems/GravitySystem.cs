@@ -1,3 +1,4 @@
+using System;
 using FirstGame.Ecs.Components;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.ECS;
@@ -18,13 +19,11 @@ public class GravitySystem() : EntityUpdateSystem(Aspect.All(typeof(Velocity)))
 
     public override void Update(GameTime gameTime)
     {
-        var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
         foreach (var entityId in ActiveEntities)
         {
             var velocity = _velocityMapper.Get(entityId);
 
-            velocity.Target.Y += GravityAcceleration;
+            if (velocity.Target.Y < GravityAcceleration * 4) velocity.Target.Y += GravityAcceleration;
         }
     }
 }

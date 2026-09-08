@@ -25,7 +25,12 @@ public class InputSystem() : EntityUpdateSystem(Aspect.All(typeof(Velocity)))
         foreach (var entityId in ActiveEntities)
         {
             var velocity = _velocityMapper.Get(entityId);
-            var newVelocityTarget = new Vector2(0.0f, velocity.Value.Y);
+            var newVelocityTarget = velocity.Target;
+
+            if (InputManager.Instance.Keyboard.IsKeyDown(Keys.Q)) newVelocityTarget.X = Math.Clamp(newVelocityTarget.X - _speedVector.X, -Speed, Speed);
+            else if (newVelocityTarget.X < 0) newVelocityTarget.X = 0;
+            if (InputManager.Instance.Keyboard.IsKeyDown(Keys.D)) newVelocityTarget.X = Math.Clamp(newVelocityTarget.X + _speedVector.X, -Speed, Speed);
+            else if (newVelocityTarget.X > 0) newVelocityTarget.X = 0;
 
             if (InputManager.Instance.Keyboard.IsKeyDown(Keys.Space))
             {
@@ -36,9 +41,6 @@ public class InputSystem() : EntityUpdateSystem(Aspect.All(typeof(Velocity)))
                 }
             }
 
-            if (InputManager.Instance.Keyboard.IsKeyDown(Keys.Q)) newVelocityTarget.X -= _speedVector.X;
-            if (InputManager.Instance.Keyboard.IsKeyDown(Keys.D)) newVelocityTarget.X += _speedVector.X;
-            
             velocity.Target = newVelocityTarget;
         }
     }

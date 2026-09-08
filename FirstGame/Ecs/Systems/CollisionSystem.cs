@@ -32,7 +32,7 @@ public class CollisionSystem(CollisionWorld2D world)
             var sprite = _spriteMapper.Get(entityId);
 
             var boundingBox = BoundingBox2D.CreateFromPositionAndSize(transform.Position, sprite.Size.ToVector2());
-            var collisionActors = world.QueryCandidates(boundingBox, "Walls").ToArray();
+            var collisionActors = world.QueryCandidates(boundingBox).ToArray();
 
             if (collisionActors.Length is 0) return;
 
@@ -56,7 +56,8 @@ public class CollisionSystem(CollisionWorld2D world)
 
             if (translationVector == Vector2.Zero) return;
 
-            if (Math.Sign(velocity.Target.X) is not 0 && Math.Sign(velocity.Target.X) != Math.Sign(correctionX)) velocity.CanGoUp = true;
+            if (Math.Sign(velocity.Target.X) is not 0 && Math.Sign(velocity.Target.X) != Math.Sign(correctionX))
+                velocity.CanGoUp = true;
 
             velocity.Value.Y = 0;
 

@@ -1,35 +1,41 @@
-using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tilemaps;
 
 namespace FirstGame.GameObjects;
 
-public class GameWorldData
-{
-}
-
 public class GameWorld
 {
-    public required TilemapWorld TilemapWorld { get; set; }
-    public required GameWorldData Data { get; set; }
-    public required GameLevel CurrentGameLevel { get; set; }
-    public required GameLevel[] Levels { get; set; }
+    public TilemapWorld TilemapWorld { get; }
+    public GameLevel? ActiveLevel { get; private set; }
 
-    public static GameWorld FromTilemapWorld(TilemapWorld tilemapWorld)
+    public GameWorld(TilemapWorld tilemapWorld)
     {
-        var data = ParseData(tilemapWorld);
-        var levels = tilemapWorld.Levels.Select(GameLevel.FromTilemap).ToArray();
-
-        return new GameWorld
-        {
-            TilemapWorld = tilemapWorld,
-            Data = data,
-            Levels = levels,
-            CurrentGameLevel = levels[0],
-        };
+        TilemapWorld = tilemapWorld;
     }
 
-    private static GameWorldData ParseData(TilemapWorld tilemapWorld)
+    public void LoadLevel(int index, GameWindow window, GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
     {
-        return new GameWorldData();
+        LoadLevel(TilemapWorld.Levels[index], window, graphicsDevice, spriteBatch);
+    }
+
+    public void LoadLevel(Tilemap tilemap, GameWindow window, GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
+    {
+        ActiveLevel = new GameLevel(tilemap);
+        ActiveLevel.Initialize(window, graphicsDevice, spriteBatch);
+    }
+
+    public void UnloadLevel()
+    {
+    }
+
+    public void Update(GameTime gameTime)
+    {
+        ActiveLevel?.Update(gameTime);
+    }
+
+    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+    {
+        ActiveLevel?.Draw(gameTime, spriteBatch);
     }
 }
