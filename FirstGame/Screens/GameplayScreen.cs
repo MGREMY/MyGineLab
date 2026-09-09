@@ -2,6 +2,7 @@ using System.IO;
 using Core;
 using FirstGame.GameObjects;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tilemaps;
 
 namespace FirstGame.Screens;
@@ -18,9 +19,10 @@ public class GameplayScreen : BaseScreen
     {
         base.LoadContent();
 
+        var font = Content.Load<SpriteFont>(Path.Combine("fonts", "roboto"));
         var tilemapWorld = Content.Load<TilemapWorld>(Path.Combine("map", "world"));
 
-        _gameWorld = new GameWorld(tilemapWorld);
+        _gameWorld = new GameWorld(tilemapWorld, font);
         _gameWorld.LoadLevel(0, Window, GraphicsDevice, SpriteBatch);
     }
 

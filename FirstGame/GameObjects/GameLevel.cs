@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using FirstGame.Collisions;
+using FirstGame.Ecs;
 using FirstGame.Ecs.Components;
 using FirstGame.Ecs.Systems;
 using FirstGame.Helper;
@@ -15,6 +16,7 @@ using MonoGame.Extended.Graphics;
 using MonoGame.Extended.Tilemaps;
 using MonoGame.Extended.Tilemaps.Rendering;
 using MonoGame.Extended.ViewportAdapters;
+using Entity = MonoGame.Extended.ECS.Entity;
 
 namespace FirstGame.GameObjects;
 
@@ -26,9 +28,6 @@ public struct GameLevelData
 
 public class GameLevel
 {
-    public Tilemap Tilemap { get; }
-    public GameLevelData Data { get; }
-
     [MemberNotNullWhen(true,
         nameof(_renderer),
         nameof(_camera),
@@ -36,6 +35,10 @@ public class GameLevel
         nameof(_ecs))]
     private bool Initialized { get; set; }
 
+    public Tilemap Tilemap { get; }
+    public GameLevelData Data { get; }
+
+    private int _idCounter;
     private TilemapSpriteBatchRenderer? _renderer;
     private OrthographicCamera? _camera;
     private CollisionWorld2D? _collisions;
@@ -57,14 +60,22 @@ public class GameLevel
         if (!Initialized) throw new InvalidOperationException("GameLevel must be initialized first.");
     }
 
-    public void Initialize(GameWindow window, GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
+    public void Initialize(
+        GameWindow window,
+        GraphicsDevice graphicsDevice,
+        SpriteBatch spriteBatch,
+        SpriteFont font)
     {
         _renderer = CreateRenderer(Tilemap);
         _camera = CreateCamera(window, graphicsDevice);
         _collisions = CreateCollisions(Tilemap);
-        _ecs = CreateEcs(spriteBatch, _camera, _collisions);
+        _ecs = CreateEcs(spriteBatch, _camera, _collisions, font);
 
-        InitializeEntities(_ecs, TextureHelper.CreateFromSize(graphicsDevice, new Point(16), Color.White), Data);
+        InitializeEntities(
+            _ecs,
+            TextureHelper.CreateFromSize(graphicsDevice, new Point(16), Color.White),
+            Data,
+            _collisions);
 
         Initialized = true;
     }
@@ -112,21 +123,35 @@ public class GameLevel
             virtualHeight: Data.VirtualCameraSize.Y);
         var camera = new OrthographicCamera(viewportAdapter);
 
+        camera.EnableWorldBounds(Tilemap.WorldBounds);
+        camera.IsZoomClampedToWorldBounds = true;
+
         return camera;
     }
 
     private CollisionWorld2D CreateCollisions(Tilemap tilemap)
     {
         const string layerName = "Walls";
-        var idCounter = 0;
+        const string collisionLayerWallsName = "Walls";
+        const string collisionLayerPlayerName = "Player";
 
         var tilemapSize = tilemap.TileToWorldPosition(tilemap.Width, tilemap.Height);
-        var collisionBroadphase = new SpatialHash(new SizeF(tilemapSize.X, tilemapSize.Y));
-        var defaultLayer = new Layer(collisionBroadphase)
+        var collisionBroadphaseWall = new SpatialHash(new SizeF(tilemapSize.X, tilemapSize.Y));
+        var collisionBroadphasePlayer = new SpatialHash(new SizeF(tilemapSize.X, tilemapSize.Y));
+        var wallLayer = new Layer(collisionBroadphaseWall)
         {
             IsDynamic = false,
         };
-        var collisions = new CollisionWorld2D(defaultLayer);
+        var playerLayer = new Layer(collisionBroadphasePlayer)
+        {
+            IsDynamic = true,
+        };
+        var collisions = new CollisionWorld2D();
+        collisions.AddLayer(collisionLayerWallsName, wallLayer);
+        collisions.AddLayer(collisionLayerPlayerName, playerLayer);
+        collisions.DisableCollisionBetweenLayers(collisionLayerWallsName, collisionLayerWallsName);
+        collisions.DisableCollisionBetweenLayers(collisionLayerPlayerName, collisionLayerPlayerName);
+        collisions.EnableCollisionBetweenLayers(collisionLayerWallsName, collisionLayerPlayerName);
 
         if (tilemap.Layers[layerName] is not TilemapTileLayer tileLayer) return collisions;
 
@@ -144,72 +169,91 @@ public class GameLevel
                 height: tilemap.TileHeight);
 
             collisions.Insert(new TileActor(
-                id: i + idCounter,
-                collisionShape));
+                    id: i + _idCounter,
+                    collisionShape),
+                collisionLayerWallsName);
         }
 
-        idCounter += tiles.Length;
+        _idCounter += tiles.Length;
 
         // World borders
         {
             // Top
-            collisions.Insert(new BorderActor(
-                id: ++idCounter,
-                collisionShape: CollisionHelper.CreateFromPositionAndSize(
-                    x: 0,
-                    y: -tilemap.TileWidth,
-                    width: tilemap.TileWidth,
-                    height: 0)));
+            collisions.Insert(new TileActor(
+                    id: ++_idCounter,
+                    collisionShape: CollisionHelper.CreateFromPositionAndSize(
+                        x: 0,
+                        y: -tilemap.TileWidth,
+                        width: tilemap.TileWidth,
+                        height: 0)),
+                collisionLayerWallsName);
             // Bottom
-            collisions.Insert(new BorderActor(
-                id: ++idCounter,
-                collisionShape: CollisionHelper.CreateFromPositionAndSize(
-                    x: 0,
-                    y: tilemap.Height,
-                    width: tilemap.TileWidth,
-                    height: tilemap.TileHeight)));
+            collisions.Insert(new TileActor(
+                    id: ++_idCounter,
+                    collisionShape: CollisionHelper.CreateFromPositionAndSize(
+                        x: 0,
+                        y: tilemap.Height,
+                        width: tilemap.TileWidth,
+                        height: tilemap.TileHeight)),
+                collisionLayerWallsName);
             // Left
-            collisions.Insert(new BorderActor(
-                id: ++idCounter,
-                collisionShape: CollisionHelper.CreateFromPositionAndSize(
-                    x: -tilemap.TileWidth,
-                    y: 0,
-                    width: tilemap.TileWidth,
-                    height: tilemap.Height)));
+            collisions.Insert(new TileActor(
+                    id: ++_idCounter,
+                    collisionShape: CollisionHelper.CreateFromPositionAndSize(
+                        x: -tilemap.TileWidth,
+                        y: 0,
+                        width: tilemap.TileWidth,
+                        height: tilemap.Height)),
+                collisionLayerWallsName);
             // Right
-            collisions.Insert(new BorderActor(
-                id: ++idCounter,
-                collisionShape: CollisionHelper.CreateFromPositionAndSize(
-                    x: tilemap.Width,
-                    y: 0,
-                    width: tilemap.TileWidth,
-                    height: tilemap.Height)));
+            collisions.Insert(new TileActor(
+                    id: ++_idCounter,
+                    collisionShape: CollisionHelper.CreateFromPositionAndSize(
+                        x: tilemap.Width,
+                        y: 0,
+                        width: tilemap.TileWidth,
+                        height: tilemap.Height)),
+                collisionLayerWallsName);
         }
 
         return collisions;
     }
 
-    private World CreateEcs(SpriteBatch spriteBatch, OrthographicCamera camera, CollisionWorld2D collisions)
+    private World CreateEcs(
+        SpriteBatch spriteBatch,
+        OrthographicCamera camera,
+        CollisionWorld2D collisions,
+        SpriteFont font)
     {
         var ecs = new WorldBuilder()
             .AddSystem(new InputSystem())
             .AddSystem(new GravitySystem())
-            .AddSystem(new MovementSystem())
-            .AddSystem(new CollisionSystem(collisions))
+            .AddSystem(new NewMovementSystem(collisions))
+            .AddSystem(new NewCollisionSystem(collisions))
             .AddSystem(new CameraSystem(camera))
             .AddSystem(new RenderSystem(spriteBatch, camera))
+            .AddSystem(new DebugRenderSystem(spriteBatch, camera, font))
             .Build();
 
         return ecs;
     }
 
-    private void InitializeEntities(World ecs, Texture2D defaultTexture, GameLevelData data)
+    private void InitializeEntities(
+        World ecs,
+        Texture2D defaultTexture,
+        GameLevelData data,
+        CollisionWorld2D collisionWorld)
     {
-        var player = ecs.CreateEntity();
-        player.Attach(new Transform2(data.SpawnPoint));
-        player.Attach(new Velocity());
-        player.Attach(new Sprite(defaultTexture));
-        player.Attach(new CameraTarget());
+        var actor = new PlayerActor(
+            id: ++_idCounter,
+            shape: CollisionHelper.CreateFromPositionAndSize(
+                x: data.SpawnPoint.X,
+                y: data.SpawnPoint.Y,
+                width: defaultTexture.Width,
+                height: defaultTexture.Height));
+
+        collisionWorld.Insert(actor, "Player");
+        EcsHelper.CreatePlayer(ecs, data.SpawnPoint, defaultTexture, actor);
     }
 
     public void Update(GameTime gameTime)

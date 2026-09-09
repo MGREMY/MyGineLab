@@ -7,22 +7,36 @@ namespace FirstGame.GameObjects;
 public class GameWorld
 {
     public TilemapWorld TilemapWorld { get; }
+    public SpriteFont Font { get; }
     public GameLevel? ActiveLevel { get; private set; }
 
-    public GameWorld(TilemapWorld tilemapWorld)
+    public GameWorld(TilemapWorld tilemapWorld, SpriteFont font)
     {
         TilemapWorld = tilemapWorld;
+        Font = font;
     }
 
-    public void LoadLevel(int index, GameWindow window, GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
+    public void LoadLevel(
+        int index,
+        GameWindow window,
+        GraphicsDevice graphicsDevice,
+        SpriteBatch spriteBatch)
     {
-        LoadLevel(TilemapWorld.Levels[index], window, graphicsDevice, spriteBatch);
+        LoadLevel(
+            TilemapWorld.Levels[index],
+            window,
+            graphicsDevice,
+            spriteBatch);
     }
 
-    public void LoadLevel(Tilemap tilemap, GameWindow window, GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
+    public void LoadLevel(
+        Tilemap tilemap,
+        GameWindow window,
+        GraphicsDevice graphicsDevice,
+        SpriteBatch spriteBatch)
     {
         ActiveLevel = new GameLevel(tilemap);
-        ActiveLevel.Initialize(window, graphicsDevice, spriteBatch);
+        ActiveLevel.Initialize(window, graphicsDevice, spriteBatch, Font);
     }
 
     public void UnloadLevel()

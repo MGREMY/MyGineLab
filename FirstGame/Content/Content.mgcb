@@ -14,6 +14,14 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin fonts/roboto.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/processorParam:Version=3.8.5.1
+/build:fonts/roboto.spritefont
+
 #begin map/world.ldtk
 /importer:TilemapWorldImporter
 /processor:TilemapWorldProcessor
