@@ -60,7 +60,7 @@ public class RenderSystem : EntityDrawSystem
             {
                 var bounds = new RectangleF(
                     position: transformComponent.Position,
-                    size: _properties.PlayerSize);
+                    size: transformComponent.Size);
 
                 _spriteBatch.DrawInsideStretch(spriteComponent.Sprite, bounds);
             }
