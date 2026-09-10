@@ -5,8 +5,31 @@ using System.Linq;
 
 namespace Platformer.Engine.Helpers;
 
+/// <summary>
+/// Provides string grouping utilities shared by the engine's content helpers.
+/// </summary>
 public static class StringHelper
 {
+    /// <summary>
+    /// Groups a set of names by the shared key that precedes the last occurrence
+    /// of the given separator.
+    /// </summary>
+    /// <remarks>
+    /// This helper encodes the engine's sprite-frame naming convention: a set of
+    /// regions named <c>&lt;animationKey&gt;~NN</c> (for example
+    /// <c>adventurer-idle~00</c>, <c>adventurer-idle~01</c>) produces one group per
+    /// <c>&lt;animationKey&gt;</c>. The part before the last separator is the
+    /// animation key and the numeric suffix is the frame counter, which must be
+    /// zero-padded (<c>~00</c>, <c>~01</c>, …) so that the returned frame order,
+    /// based on a case-insensitive ordinal sort, matches the playback order. An
+    /// item that has no separator becomes its own single-frame group keyed by its
+    /// own name, so sheets do not strictly require the separator.
+    /// </remarks>
+    /// <param name="separator">The character separating the animation key from the
+    /// frame counter.</param>
+    /// <param name="items">The names to group.</param>
+    /// <returns>A dictionary mapping each animation key to its ordered frame
+    /// names.</returns>
     public static Dictionary<string, Collection<string>> GroupByCommonPrefix(char separator, string[] items)
     {
         if (items.Length is 0) return [];

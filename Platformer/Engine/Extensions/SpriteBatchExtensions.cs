@@ -6,13 +6,19 @@ using MonoGame.Extended.Graphics;
 
 namespace Platformer.Engine.Extensions;
 
+/// <summary>
+/// Provides sprite-batch drawing extensions used by the engine's render systems.
+/// </summary>
 public static class SpriteBatchExtensions
 {
+    /// <summary>
+    /// Contains sprite drawing extensions for <see cref="SpriteBatch"/>.
+    /// </summary>
     extension(SpriteBatch spriteBatch)
     {
         /// <summary>
         /// Draws a sprite inside a designated rectangle, scaling the texture inside.
-        /// The sprite is horizontally centered and bottom anchored
+        /// The sprite is horizontally centered and bottom anchored.
         /// </summary>
         /// <param name="sprite">The sprite to draw.</param>
         /// <param name="bounds">The bounds where the sprite must be drawn.</param>
@@ -67,10 +73,11 @@ public static class SpriteBatchExtensions
         }
 
         /// <summary>
-        /// Draws a sprite inside a designated rectangle, stretching the texture inside.
+        /// Draws a sprite stretched so it fills the designated rectangle exactly,
+        /// regardless of the sprite's aspect ratio.
         /// </summary>
         /// <param name="sprite">The sprite to draw.</param>
-        /// <param name="bounds">The bounds where the sprite must be drawn.</param>
+        /// <param name="bounds">The bounds the sprite must fill.</param>
         public void DrawInsideStretch(Sprite sprite, RectangleF bounds)
         {
             var region = sprite.TextureRegion;

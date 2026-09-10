@@ -9,6 +9,16 @@ using Platformer.Engine.Ecs.Components;
 
 namespace Platformer.Engine.Ecs.Systems;
 
+/// <summary>
+/// Reads the player's input and translates it into velocity targets and jumps.
+/// </summary>
+/// <remarks>
+/// Movement uses a target velocity that <see cref="MovementSystem"/> ramps
+/// toward: Q pushes left, D pushes right and releasing the key sets the target
+/// back to zero. Jumping applies an immediate upward impulse only when the
+/// player is allowed to jump; a player that is mid-air after jumping has the
+/// jump allowance revoked on the first jump, enabling a single double jump.
+/// </remarks>
 public class PlayerControlSystem : EntityUpdateSystem
 {
     private readonly LevelProperties _properties;
@@ -16,18 +26,28 @@ public class PlayerControlSystem : EntityUpdateSystem
     private ComponentMapper<PlayerComponent> _playerComponentMapper = null!;
     private ComponentMapper<VelocityComponent> _velocityComponentMapper = null!;
 
+    /// <summary>
+    /// Initializes a new instance of the player control system.
+    /// </summary>
+    /// <param name="properties">The properties of the level.</param>
     public PlayerControlSystem(LevelProperties properties) : base(Aspect.All(typeof(PlayerComponent),
         typeof(VelocityComponent)))
     {
         _properties = properties;
     }
 
+    /// <inheritdoc/>
     public override void Initialize(IComponentMapperService mapperService)
     {
         _playerComponentMapper = mapperService.GetMapper<PlayerComponent>();
         _velocityComponentMapper = mapperService.GetMapper<VelocityComponent>();
     }
 
+    /// <summary>
+    /// Updates each player's target velocity from the keyboard and applies an
+    /// upward jump impulse when the jump key is pressed and the player can jump.
+    /// </summary>
+    /// <param name="gameTime">The game time elapsed since the last update.</param>
     public override void Update(GameTime gameTime)
     {
         var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;

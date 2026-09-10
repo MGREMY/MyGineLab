@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,7 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.Collisions;
 using MonoGame.Extended.ECS;
-using MonoGame.Extended.Graphics;
 using MonoGame.Extended.Tilemaps;
 using MonoGame.Extended.Tilemaps.Rendering;
 using Platformer.Engine.Collisions;
@@ -17,10 +15,23 @@ using Platformer.Engine.Helpers;
 
 namespace Platformer.Engine;
 
+/// <summary>
+/// Builds a <see cref="LevelData"/> out of a tilemap: it creates the level's
+/// collision walls, spawn point, player and entities.
+/// </summary>
 public static class LevelBuilder
 {
     private static int _nextId;
 
+    /// <summary>
+    /// Loads the tilemap at the given path and builds its level data.
+    /// </summary>
+    /// <param name="levelPath">The path of the tilemap asset to load.</param>
+    /// <param name="content">The content manager used to load the tilemap.</param>
+    /// <param name="properties">The properties of the level.</param>
+    /// <param name="ecs">The ECS world the level entities are created in.</param>
+    /// <param name="collisions">The collision world the level colliders are inserted into.</param>
+    /// <returns>The built level data.</returns>
     public static LevelData Build(
         string levelPath,
         ContentManager content,
@@ -33,6 +44,16 @@ public static class LevelBuilder
         return Build(tilemap, content, properties, ecs, collisions);
     }
 
+    /// <summary>
+    /// Builds the level data from the given tilemap: collision walls, spawn
+    /// point, player and entities.
+    /// </summary>
+    /// <param name="tilemap">The tilemap describing the level geometry.</param>
+    /// <param name="content">The content manager used to load level assets.</param>
+    /// <param name="properties">The properties of the level.</param>
+    /// <param name="ecs">The ECS world the level entities are created in.</param>
+    /// <param name="collisions">The collision world the level colliders are inserted into.</param>
+    /// <returns>The built level data.</returns>
     public static LevelData Build(
         Tilemap tilemap,
         ContentManager content,
@@ -64,6 +85,12 @@ public static class LevelBuilder
         };
     }
 
+    /// <summary>
+    /// Loads the level properties from the tilemap's map properties, falling
+    /// back to the <see cref="Constants"/> values when a property is missing.
+    /// </summary>
+    /// <param name="map">The tilemap whose properties are read.</param>
+    /// <returns>The loaded level properties.</returns>
     public static LevelProperties LoadProperties(Tilemap map)
     {
         var properties = new LevelProperties
@@ -71,8 +98,9 @@ public static class LevelBuilder
             VirtualCameraSize = new Point(
                 map.Properties.GetInt("VirtualCameraWidth", Constants.CameraWidth),
                 map.Properties.GetInt("VirtualCameraHeight", Constants.CameraHeight)),
-            PlayerWidth = map.Properties.GetFloat("PlayerWidth", Constants.PlayerWidth),
-            PlayerHeight = map.Properties.GetFloat("PlayerHeight", Constants.PlayerHeight),
+            PlayerSize = new Vector2(
+                map.Properties.GetFloat("PlayerWidth", Constants.PlayerWidth),
+                map.Properties.GetFloat("PlayerHeight", Constants.PlayerHeight)),
             Gravity = map.Properties.GetFloat("Gravity", Constants.Gravity),
             GravityScale = map.Properties.GetFloat("GravityScale", Constants.GravityScale),
             MoveAcceleration = map.Properties.GetFloat("MoveAcceleration", Constants.MoveAcceleration),
@@ -100,6 +128,7 @@ public static class LevelBuilder
             )));
     }
 
+    /// <summary>
     /// Sweeps the grid row by row and collapses contiguous solid tiles into
     /// axis-aligned rectangles that span as many rows as possible.
     ///
@@ -108,6 +137,7 @@ public static class LevelBuilder
     /// new rectangle — the existing one just got one row taller. Only when a
     /// run disappears do we know its height and emit the finished rectangle.
     /// A final extra (empty) pass forces every still-open rectangle to flush.
+    /// </summary>
     private static IEnumerable<Rectangle> MergeSolidRuns(int[,] solid)
     {
         var width = solid.GetLength(0);
@@ -188,14 +218,12 @@ public static class LevelBuilder
         CollisionWorld2D collisions,
         Vector2 spawnPoint)
     {
-        var playerSize = new Vector2(properties.PlayerWidth, properties.PlayerHeight);
-
         var player = ecs.CreateEntity();
         player.Attach(new PlayerComponent());
         player.Attach(new CameraTargetComponent());
-        player.Attach(new Transform2Component { Position = spawnPoint, Size = playerSize });
+        player.Attach(new Transform2Component { Position = spawnPoint, Size = properties.PlayerSize });
         player.Attach(new VelocityComponent());
-        player.Attach(CreateCollider(collisions, spawnPoint, playerSize, properties.CollisionPlayerLayer));
+        player.Attach(CreateCollider(collisions, spawnPoint, properties.PlayerSize, properties.CollisionPlayerLayer));
         player.Attach(
             new SpriteComponent(
                 SpriteHelper.CreateAnimatedSprite(content, Path.Combine("texture", "player", "player"))));

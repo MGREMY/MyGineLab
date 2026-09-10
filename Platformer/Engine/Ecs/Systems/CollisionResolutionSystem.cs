@@ -6,6 +6,11 @@ using Platformer.Engine.Ecs.Components;
 
 namespace Platformer.Engine.Ecs.Systems;
 
+/// <summary>
+/// Resolves the collisions each collider detected on the last physics query:
+/// it pushes the entity out of the walls and adjusts its velocity and player
+/// state accordingly.
+/// </summary>
 public class CollisionResolutionSystem : EntityUpdateSystem
 {
     private readonly LevelProperties _properties;
@@ -15,12 +20,17 @@ public class CollisionResolutionSystem : EntityUpdateSystem
     private ComponentMapper<VelocityComponent> _velocityComponentMapper = null!;
     private ComponentMapper<PlayerComponent> _playerComponentMapper = null!;
 
+    /// <summary>
+    /// Initializes a new instance of the collision resolution system.
+    /// </summary>
+    /// <param name="properties">The properties of the level.</param>
     public CollisionResolutionSystem(LevelProperties properties) : base(Aspect.All(typeof(ColliderComponent),
         typeof(Transform2Component)))
     {
         _properties = properties;
     }
 
+    /// <inheritdoc/>
     public override void Initialize(IComponentMapperService mapperService)
     {
         _colliderComponentMapper = mapperService.GetMapper<ColliderComponent>();
@@ -29,6 +39,12 @@ public class CollisionResolutionSystem : EntityUpdateSystem
         _playerComponentMapper = mapperService.GetMapper<PlayerComponent>();
     }
 
+    /// <summary>
+    /// Pushes each entity out of its collisions, then zeroes or clamps the
+    /// velocity along each pushed axis and updates the player's on-ground,
+    /// on-ceiling, on-wall and jump state.
+    /// </summary>
+    /// <param name="gameTime">The game time elapsed since the last update.</param>
     public override void Update(GameTime gameTime)
     {
         foreach (var entityId in ActiveEntities)

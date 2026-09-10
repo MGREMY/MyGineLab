@@ -8,15 +8,25 @@ using Platformer.Engine.Extensions;
 
 namespace Platformer.Engine.Ecs.Systems;
 
+/// <summary>
+/// Draws every entity's sprite through the camera, stretched to fill its
+/// hitbox exactly.
+/// </summary>
 public class RenderSystem : EntityDrawSystem
 {
-    private LevelProperties _properties;
+    private readonly LevelProperties _properties;
     private readonly SpriteBatch _spriteBatch;
     private readonly OrthographicCamera _camera;
 
     private ComponentMapper<Transform2Component> _transformComponentMapper = null!;
     private ComponentMapper<SpriteComponent> _spriteComponentMapper = null!;
 
+    /// <summary>
+    /// Initializes a new instance of the render system.
+    /// </summary>
+    /// <param name="properties">The properties of the level.</param>
+    /// <param name="spriteBatch">The sprite batch used to render the entities.</param>
+    /// <param name="camera">The camera used to transform the drawing.</param>
     public RenderSystem(LevelProperties properties, SpriteBatch spriteBatch, OrthographicCamera camera) : base(
         Aspect.All(typeof(Transform2Component), typeof(SpriteComponent)))
     {
@@ -25,12 +35,18 @@ public class RenderSystem : EntityDrawSystem
         _camera = camera;
     }
 
+    /// <inheritdoc/>
     public override void Initialize(IComponentMapperService mapperService)
     {
         _transformComponentMapper = mapperService.GetMapper<Transform2Component>();
         _spriteComponentMapper = mapperService.GetMapper<SpriteComponent>();
     }
 
+    /// <summary>
+    /// Draws each entity's sprite stretched inside its hitbox, skipping
+    /// entities outside the camera's view.
+    /// </summary>
+    /// <param name="gameTime">The game time elapsed since the last update.</param>
     public override void Draw(GameTime gameTime)
     {
         _spriteBatch.Begin(transformMatrix: _camera.GetViewMatrix());
@@ -44,7 +60,7 @@ public class RenderSystem : EntityDrawSystem
             {
                 var bounds = new RectangleF(
                     position: transformComponent.Position,
-                    size: new SizeF(_properties.PlayerWidth, _properties.PlayerHeight));
+                    size: _properties.PlayerSize);
 
                 _spriteBatch.DrawInsideStretch(spriteComponent.Sprite, bounds);
             }

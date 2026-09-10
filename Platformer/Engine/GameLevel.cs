@@ -13,8 +13,15 @@ using Platformer.Engine.Ecs.Systems;
 
 namespace Platformer.Engine;
 
+/// <summary>
+/// Represents a playable level: it builds its own ECS world, collision world,
+/// entities and camera, then drives them each frame.
+/// </summary>
 public class GameLevel
 {
+    /// <summary>
+    /// Gets the tilemap describing the level geometry.
+    /// </summary>
     public Tilemap Tilemap { get; }
 
     [MemberNotNullWhen(
@@ -32,6 +39,10 @@ public class GameLevel
     private LevelData? _data;
     private LevelProperties? _properties;
 
+    /// <summary>
+    /// Initializes a new instance of a level from the given tilemap.
+    /// </summary>
+    /// <param name="tilemap">The tilemap describing the level geometry.</param>
     public GameLevel(Tilemap tilemap)
     {
         Tilemap = tilemap;
@@ -48,6 +59,15 @@ public class GameLevel
         if (!Initialized) throw new InvalidOperationException("GameLevel must be initialized first.");
     }
 
+    /// <summary>
+    /// Initializes the level: loads its properties, creates the camera, the
+    /// collision world, the ECS world with all its systems, and the level
+    /// entities.
+    /// </summary>
+    /// <param name="window">The game window used by the camera viewport adapter.</param>
+    /// <param name="graphicsDevice">The graphics device used to create rendering resources.</param>
+    /// <param name="content">The content manager used to load level assets.</param>
+    /// <param name="spriteBatch">The sprite batch used to render the level.</param>
     public void Initialize(
         GameWindow window,
         GraphicsDevice graphicsDevice,
@@ -89,6 +109,11 @@ public class GameLevel
         Initialized = true;
     }
 
+    /// <summary>
+    /// Updates the level by running every ECS system. Requires
+    /// <see cref="Initialize"/> to have been called first.
+    /// </summary>
+    /// <param name="gameTime">The game time elapsed since the last update.</param>
     public void Update(GameTime gameTime)
     {
         EnsureInitialized();
@@ -96,6 +121,12 @@ public class GameLevel
         _ecs.Update(gameTime);
     }
 
+    /// <summary>
+    /// Draws the level's tilemap and then every ECS draw system. Requires
+    /// <see cref="Initialize"/> to have been called first.
+    /// </summary>
+    /// <param name="gameTime">The game time elapsed since the last update.</param>
+    /// <param name="spriteBatch">The sprite batch used to render the level.</param>
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
         EnsureInitialized();
