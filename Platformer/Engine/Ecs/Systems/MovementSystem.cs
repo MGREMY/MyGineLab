@@ -8,10 +8,13 @@ namespace Platformer.Engine.Ecs.Systems;
 
 public class MovementSystem : EntityUpdateSystem
 {
+    private readonly LevelProperties _properties;
+
     private ComponentMapper<VelocityComponent> _velocityComponentMapper;
 
-    public MovementSystem() : base(Aspect.All(typeof(VelocityComponent)))
+    public MovementSystem(LevelProperties properties) : base(Aspect.All(typeof(VelocityComponent)))
     {
+        _properties = properties;
     }
 
     public override void Initialize(IComponentMapperService mapperService)
@@ -30,7 +33,7 @@ public class MovementSystem : EntityUpdateSystem
             velocityComponent.Value.X = MoveTowards(
                 current: velocityComponent.Value.X,
                 target: velocityComponent.Target.X,
-                amount: Constants.MovementSpeed * deltaTime);
+                amount: _properties.MoveAcceleration * deltaTime);
 
             /*
             velocityComponent.Value = MoveTowards(

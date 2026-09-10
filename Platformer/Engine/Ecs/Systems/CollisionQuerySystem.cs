@@ -8,12 +8,15 @@ namespace Platformer.Engine.Ecs.Systems;
 
 public class CollisionQuerySystem : EntityUpdateSystem
 {
+    private readonly LevelProperties _properties;
     private readonly CollisionWorld2D _collisions;
 
     private ComponentMapper<ColliderComponent> _colliderComponentMapper = null!;
 
-    public CollisionQuerySystem(CollisionWorld2D collisions) : base(Aspect.All(typeof(ColliderComponent)))
+    public CollisionQuerySystem(LevelProperties properties, CollisionWorld2D collisions) : base(
+        Aspect.All(typeof(ColliderComponent)))
     {
+        _properties = properties;
         _collisions = collisions;
     }
 
@@ -30,7 +33,7 @@ public class CollisionQuerySystem : EntityUpdateSystem
         {
             var colliderComponent = _colliderComponentMapper.Get(entityId);
 
-            var collisions = _collisions.QueryCollisions(colliderComponent, Constants.WallLayer);
+            var collisions = _collisions.QueryCollisions(colliderComponent, _properties.CollisionWallLayer);
             colliderComponent.LastFrameCollisions = [.. collisions];
         }
     }

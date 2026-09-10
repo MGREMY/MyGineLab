@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
@@ -9,13 +8,17 @@ namespace Platformer.Engine.Ecs.Systems;
 
 public class CollisionResolutionSystem : EntityUpdateSystem
 {
+    private readonly LevelProperties _properties;
+
     private ComponentMapper<ColliderComponent> _colliderComponentMapper = null!;
     private ComponentMapper<Transform2Component> _transformComponentMapper = null!;
     private ComponentMapper<VelocityComponent> _velocityComponentMapper = null!;
     private ComponentMapper<PlayerComponent> _playerComponentMapper = null!;
 
-    public CollisionResolutionSystem() : base(Aspect.All(typeof(ColliderComponent), typeof(Transform2Component)))
+    public CollisionResolutionSystem(LevelProperties properties) : base(Aspect.All(typeof(ColliderComponent),
+        typeof(Transform2Component)))
     {
+        _properties = properties;
     }
 
     public override void Initialize(IComponentMapperService mapperService)
@@ -100,9 +103,9 @@ public class CollisionResolutionSystem : EntityUpdateSystem
                             velocityComponent.Target.Y = 0;
                         }
                         // if the velocity is going down
-                        else if (velocityComponent.Value.Y > Constants.MaxWallSlideSpeed)
+                        else if (velocityComponent.Value.Y > _properties.WallSlideSpeed)
                         {
-                            velocityComponent.Value.Y = Constants.MaxWallSlideSpeed;
+                            velocityComponent.Value.Y = _properties.WallSlideSpeed;
                         }
 
                         velocityComponent.Value.X = 0;

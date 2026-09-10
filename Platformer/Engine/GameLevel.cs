@@ -71,17 +71,17 @@ public class GameLevel
         _collisions.EnableCollisionBetweenLayers(Constants.WallLayer, Constants.PlayerLayer);
 
         _ecs = new WorldBuilder()
-            .AddSystem(new PlayerControlSystem())
-            .AddSystem(new MovementSystem())
-            .AddSystem(new PhysicsSystem())
+            .AddSystem(new PlayerControlSystem(_properties))
+            .AddSystem(new MovementSystem(_properties))
+            .AddSystem(new PhysicsSystem(_properties))
             .AddSystem(new CollisionSyncSystem())
-            .AddSystem(new CollisionQuerySystem(_collisions))
-            .AddSystem(new CollisionResolutionSystem())
+            .AddSystem(new CollisionQuerySystem(_properties, _collisions))
+            .AddSystem(new CollisionResolutionSystem(_properties))
             .AddSystem(new CameraSystem(_camera))
             .AddSystem(new RenderSystem(spriteBatch, _camera))
             .Build();
 
-        _data = LevelBuilder.Build(Tilemap, graphicsDevice, _ecs, _collisions);
+        _data = LevelBuilder.Build(Tilemap, _properties, graphicsDevice, _ecs, _collisions);
 
         Initialized = true;
     }

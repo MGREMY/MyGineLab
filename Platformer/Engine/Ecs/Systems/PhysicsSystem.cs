@@ -8,11 +8,15 @@ namespace Platformer.Engine.Ecs.Systems;
 
 public class PhysicsSystem : EntityUpdateSystem
 {
+    private readonly LevelProperties _properties;
+
     private ComponentMapper<VelocityComponent> _velocityComponentMapper = null!;
     private ComponentMapper<Transform2Component> _transformComponentMapper = null!;
 
-    public PhysicsSystem() : base(Aspect.All(typeof(VelocityComponent), typeof(Transform2Component)))
+    public PhysicsSystem(LevelProperties properties) : base(Aspect.All(typeof(VelocityComponent),
+        typeof(Transform2Component)))
     {
+        _properties = properties;
     }
 
     public override void Initialize(IComponentMapperService mapperService)
@@ -31,12 +35,12 @@ public class PhysicsSystem : EntityUpdateSystem
             var transformComponent = _transformComponentMapper.Get(entityId);
 
             // Apply gravity
-            velocityComponent.Value.Y += velocityComponent.GravityScale * Constants.Gravity * deltaTime;
+            velocityComponent.Value.Y += _properties.GravityScale * _properties.Gravity * deltaTime;
 
             // Clamp the maximum fall speed
             if (velocityComponent.Value.Y > 0.0f)
             {
-                velocityComponent.Value.Y = Math.Min(velocityComponent.Value.Y, Constants.MaxFallSpeed);
+                velocityComponent.Value.Y = Math.Min(velocityComponent.Value.Y, _properties.MaxFallSpeed);
             }
 
             // Apply the velocity on the position

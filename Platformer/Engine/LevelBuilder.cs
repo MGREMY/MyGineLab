@@ -17,29 +17,31 @@ namespace Platformer.Engine;
 
 public static class LevelBuilder
 {
-    private static int _nextId = 0;
+    private static int _nextId;
 
     public static LevelData Build(
         string levelPath,
         ContentManager content,
+        LevelProperties properties,
         GraphicsDevice graphicsDevice,
         World ecs,
         CollisionWorld2D collisions)
     {
         var tilemap = content.Load<Tilemap>(levelPath);
 
-        return Build(tilemap, graphicsDevice, ecs, collisions);
+        return Build(tilemap, properties, graphicsDevice, ecs, collisions);
     }
 
     public static LevelData Build(
         Tilemap tilemap,
+        LevelProperties properties,
         GraphicsDevice graphicsDevice,
         World ecs,
         CollisionWorld2D collisions)
     {
-        var wallActors = CreateCollisions(tilemap).Select(x => new WallActor(_nextId++, x)).ToArray();
-        var spawn = CreateSpawnPoint(tilemap);
-        var entities = CreateEntities(tilemap, graphicsDevice, ecs, collisions, spawn);
+        var wallActors = CreateCollisions(tilemap, properties).Select(x => new WallActor(_nextId++, x)).ToArray();
+        var spawn = CreateSpawnPoint(tilemap, properties);
+        var entities = CreateEntities(tilemap, properties, graphicsDevice, ecs, collisions, spawn);
 
         var renderer = new TilemapSpriteBatchRenderer
         {
@@ -47,7 +49,7 @@ public static class LevelBuilder
         };
         renderer.LoadTilemap(tilemap);
 
-        foreach (var wall in wallActors) collisions.Insert(wall, Constants.WallLayer);
+        foreach (var wall in wallActors) collisions.Insert(wall, properties.CollisionWallLayer);
 
         return new LevelData
         {
@@ -65,16 +67,25 @@ public static class LevelBuilder
         var properties = new LevelProperties
         {
             VirtualCameraSize = new Point(
-                map.Properties["VirtualCameraWidth"].AsInt(),
-                map.Properties["VirtualCameraHeight"].AsInt())
+                map.Properties.GetInt("VirtualCameraWidth", Constants.CameraWidth),
+                map.Properties.GetInt("VirtualCameraHeight", Constants.CameraHeight)),
+            PlayerWidth = map.Properties.GetFloat("PlayerWidth", Constants.PlayerWidth),
+            PlayerHeight = map.Properties.GetFloat("PlayerHeight", Constants.PlayerHeight),
+            Gravity = map.Properties.GetFloat("Gravity", Constants.Gravity),
+            GravityScale = map.Properties.GetFloat("GravityScale", Constants.GravityScale),
+            MoveAcceleration = map.Properties.GetFloat("MoveAcceleration", Constants.MoveAcceleration),
+            WalkSpeed = map.Properties.GetFloat("WalkSpeed", Constants.WalkSpeed),
+            JumpSpeed = map.Properties.GetFloat("JumpSpeed", Constants.JumpSpeed),
+            WallSlideSpeed = map.Properties.GetFloat("WallSlideSpeed", Constants.WallSlideSpeed),
+            MaxFallSpeed = map.Properties.GetFloat("MaxFallSpeed", Constants.MaxFallSpeed),
         };
 
         return properties;
     }
 
-    private static IEnumerable<CollisionShape2D> CreateCollisions(Tilemap map)
+    private static IEnumerable<CollisionShape2D> CreateCollisions(Tilemap map, LevelProperties properties)
     {
-        if (map.Layers[Constants.TilemapWallLayer] is not TilemapTileLayer tileLayer) return [];
+        if (map.Layers[properties.TilemapWallLayer] is not TilemapTileLayer tileLayer) return [];
 
         var grid = new int[tileLayer.Width, tileLayer.Height];
         foreach (var entry in tileLayer.GetTiles())
@@ -152,18 +163,15 @@ public static class LevelBuilder
         }
     }
 
-    private static Vector2 CreateSpawnPoint(Tilemap map)
+    private static Vector2 CreateSpawnPoint(Tilemap map, LevelProperties properties)
     {
-        if (map.Layers[Constants.TilemapDataLayer] is TilemapObjectLayer dataLayer)
+        if (map.Layers[properties.TilemapDataLayer] is TilemapObjectLayer dataLayer)
         {
             foreach (var o in dataLayer.Objects)
             {
-                switch (o.Name)
+                if (o.Name == properties.TilemapDataDefinitionSpawnPoint)
                 {
-                    case Constants.TilemapDataSpawnPoint:
-                    {
-                        return o.Position;
-                    }
+                    return o.Position;
                 }
             }
         }
@@ -173,18 +181,21 @@ public static class LevelBuilder
 
     private static IEnumerable<Entity> CreateEntities(
         Tilemap map,
+        LevelProperties properties,
         GraphicsDevice graphicsDevice,
         World ecs,
         CollisionWorld2D collisions,
         Vector2 spawnPoint)
     {
+        var playerSize = new Vector2(properties.PlayerWidth, properties.PlayerHeight);
+
         var player = ecs.CreateEntity();
         player.Attach(new PlayerComponent());
         player.Attach(new CameraTargetComponent());
-        player.Attach(new Transform2Component { Position = spawnPoint, Size = Constants.TilemapDataPlayerSize });
-        player.Attach(new VelocityComponent { GravityScale = Constants.TilemapDataPlayerGravityScale });
-        player.Attach(CreateCollider(collisions, spawnPoint, Constants.TilemapDataPlayerSize, Constants.PlayerLayer));
-        player.Attach(new Sprite(TextureHelper.CreateFromSize(graphicsDevice, Constants.TilemapDataPlayerSize.ToPoint(), Color.White)));
+        player.Attach(new Transform2Component { Position = spawnPoint, Size = playerSize });
+        player.Attach(new VelocityComponent());
+        player.Attach(CreateCollider(collisions, spawnPoint, playerSize, properties.CollisionPlayerLayer));
+        player.Attach(new Sprite(TextureHelper.CreateFromSize(graphicsDevice, playerSize.ToPoint(), Color.White)));
 
         yield return player;
     }
@@ -196,10 +207,10 @@ public static class LevelBuilder
         string layer)
     {
         var collider = new ColliderComponent(
-            _nextId++,
-            new CollisionShape2D(BoundingBox2D.CreateFromPositionAndSize(pos, size)));
+            id: _nextId++,
+            shape: new CollisionShape2D(BoundingBox2D.CreateFromPositionAndSize(pos, size)),
+            layerName: layer);
 
-        collider.LayerName = layer;
         collisions.Insert(collider, layer);
 
         return collider;

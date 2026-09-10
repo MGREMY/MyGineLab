@@ -11,11 +11,15 @@ namespace Platformer.Engine.Ecs.Systems;
 
 public class PlayerControlSystem : EntityUpdateSystem
 {
+    private readonly LevelProperties _properties;
+
     private ComponentMapper<PlayerComponent> _playerComponentMapper = null!;
     private ComponentMapper<VelocityComponent> _velocityComponentMapper = null!;
 
-    public PlayerControlSystem() : base(Aspect.All(typeof(PlayerComponent), typeof(VelocityComponent)))
+    public PlayerControlSystem(LevelProperties properties) : base(Aspect.All(typeof(PlayerComponent),
+        typeof(VelocityComponent)))
     {
+        _properties = properties;
     }
 
     public override void Initialize(IComponentMapperService mapperService)
@@ -35,22 +39,22 @@ public class PlayerControlSystem : EntityUpdateSystem
 
             if (InputManager.Instance.Keyboard.IsKeyDown(Keys.Q))
             {
-                velocityComponent.Target.X = Math.Clamp(velocityComponent.Target.X - Constants.PlayerSpeed,
-                    -Constants.PlayerSpeed, Constants.PlayerSpeed);
+                velocityComponent.Target.X = Math.Clamp(velocityComponent.Target.X - _properties.WalkSpeed,
+                    -_properties.WalkSpeed, _properties.WalkSpeed);
             }
             else if (velocityComponent.Target.X < 0) velocityComponent.Target.X = 0;
 
             if (InputManager.Instance.Keyboard.IsKeyDown(Keys.D))
             {
-                velocityComponent.Target.X = Math.Clamp(velocityComponent.Target.X + Constants.PlayerSpeed,
-                    -Constants.PlayerSpeed, Constants.PlayerSpeed);
+                velocityComponent.Target.X = Math.Clamp(velocityComponent.Target.X + _properties.WalkSpeed,
+                    -_properties.WalkSpeed, _properties.WalkSpeed);
             }
             else if (velocityComponent.Target.X > 0) velocityComponent.Target.X = 0;
 
             if (playerComponent.CanJump
                 && InputManager.Instance.Keyboard.WasKeyJustPressed(Keys.Space))
             {
-                velocityComponent.Value.Y = -Constants.JumpSpeed;
+                velocityComponent.Value.Y = -_properties.JumpSpeed;
 
                 if (playerComponent.IsJumping) playerComponent.CanJump = false;
 
