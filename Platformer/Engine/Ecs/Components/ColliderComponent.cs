@@ -10,7 +10,7 @@ public class ColliderComponent : ICollisionActor
     public CollisionShape2D Shape { get; private set; }
 
     public string LayerName;
-    public CollisionEvent2D[] LastFrameCollisions = [];
+    public CollisionEvent2D[] LastFrameCollisions;
 
     public ColliderComponent(int id, CollisionShape2D shape) : this(id, shape, string.Empty)
     {
@@ -18,11 +18,16 @@ public class ColliderComponent : ICollisionActor
         Shape = shape;
     }
 
-    public ColliderComponent(int id, CollisionShape2D shape, string layerName)
+    public ColliderComponent(int id, CollisionShape2D shape, string layerName) : this(id, shape, layerName, [])
+    {
+    }
+
+    public ColliderComponent(int id, CollisionShape2D shape, string layerName, CollisionEvent2D[] lastFrameCollisions)
     {
         Id = id;
         Shape = shape;
         LayerName = layerName;
+        LastFrameCollisions = lastFrameCollisions;
     }
 
     public void UpdatePosition(Vector2 position)

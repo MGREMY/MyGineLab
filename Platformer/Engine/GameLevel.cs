@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.Collisions;
@@ -50,6 +51,7 @@ public class GameLevel
     public void Initialize(
         GameWindow window,
         GraphicsDevice graphicsDevice,
+        ContentManager content,
         SpriteBatch spriteBatch)
     {
         _properties = LevelBuilder.LoadProperties(Tilemap);
@@ -78,10 +80,11 @@ public class GameLevel
             .AddSystem(new CollisionQuerySystem(_properties, _collisions))
             .AddSystem(new CollisionResolutionSystem(_properties))
             .AddSystem(new CameraSystem(_camera))
-            .AddSystem(new RenderSystem(spriteBatch, _camera))
+            .AddSystem(new SpriteSystem())
+            .AddSystem(new RenderSystem(_properties, spriteBatch, _camera))
             .Build();
 
-        _data = LevelBuilder.Build(Tilemap, _properties, graphicsDevice, _ecs, _collisions);
+        _data = LevelBuilder.Build(Tilemap, content, _properties, _ecs, _collisions);
 
         Initialized = true;
     }

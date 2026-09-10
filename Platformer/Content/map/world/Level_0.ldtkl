@@ -83,7 +83,7 @@
 			"__pxTotalOffsetX": 0,
 			"__pxTotalOffsetY": 0,
 			"__tilesetDefUid": 2,
-			"__tilesetRelPath": "../texture/cave-atlas.png",
+			"__tilesetRelPath": "../texture/atlas/cave-atlas.png",
 			"iid": "38c47710-96d0-11f1-afda-d97c98488699",
 			"levelId": 0,
 			"layerDefUid": 1,

@@ -19,7 +19,7 @@ public class GameplayScreen(BaseGame game) : BaseScreen(game)
         var tilemapWorld = Content.Load<TilemapWorld>(Path.Combine("map", "world"));
 
         _gameWorld = new GameWorld(tilemapWorld, font);
-        _gameWorld.LoadLevel(0, Window, GraphicsDevice, SpriteBatch);
+        _gameWorld.LoadLevel(0, Window, GraphicsDevice, Content, SpriteBatch);
     }
 
     public override void Update(GameTime gameTime)

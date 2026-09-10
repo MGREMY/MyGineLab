@@ -1678,9 +1678,9 @@
 		{
 			"__cWid": 12,
 			"__cHei": 5,
-			"identifier": "Cave_atlas",
+			"identifier": "Cave_atlas2",
 			"uid": 2,
-			"relPath": "../texture/cave-atlas.png",
+			"relPath": "../texture/atlas/cave-atlas.png",
 			"embedAtlas": null,
 			"pxWid": 192,
 			"pxHei": 80,

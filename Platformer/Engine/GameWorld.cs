@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tilemaps;
 
@@ -20,12 +21,14 @@ public class GameWorld
         int index,
         GameWindow window,
         GraphicsDevice graphicsDevice,
+        ContentManager content,
         SpriteBatch spriteBatch)
     {
         LoadLevel(
             World.Levels[index],
             window,
             graphicsDevice,
+            content,
             spriteBatch);
     }
 
@@ -33,10 +36,11 @@ public class GameWorld
         Tilemap tilemap,
         GameWindow window,
         GraphicsDevice graphicsDevice,
+        ContentManager content,
         SpriteBatch spriteBatch)
     {
         ActiveLevel = new GameLevel(tilemap);
-        ActiveLevel.Initialize(window, graphicsDevice, spriteBatch);
+        ActiveLevel.Initialize(window, graphicsDevice, content, spriteBatch);
     }
 
     public void Update(GameTime gameTime)

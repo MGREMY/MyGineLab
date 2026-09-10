@@ -1,0 +1,63 @@
+{
+	"textures": [
+		{
+			"filename": "player-texture.png",
+			"format": "RGBA8888",
+			"size": {"w":60,"h":83},
+			"frames": {
+				"adventurer-idle-00":{
+					"frame": {"x":40,"y":27,"w":19,"h":29},
+					"size": {"w":50,"h":37},
+					"offset": {"x":14,"y":7}
+				},
+				"adventurer-idle-01":{
+					"frame": {"x":23,"y":28,"w":17,"h":30},
+					"size": {"w":50,"h":37},
+					"offset": {"x":16,"y":6}
+				},
+				"adventurer-idle-02":{
+					"frame": {"x":0,"y":0,"w":19,"h":30},
+					"size": {"w":50,"h":37},
+					"offset": {"x":15,"y":6}
+				},
+				"adventurer-run-00":{
+					"frame": {"x":19,"y":0,"w":20,"h":28},
+					"size": {"w":50,"h":37},
+					"offset": {"x":17,"y":8}
+				},
+				"adventurer-run-01":{
+					"frame": {"x":39,"y":0,"w":20,"h":27},
+					"size": {"w":50,"h":37},
+					"offset": {"x":16,"y":9}
+				},
+				"adventurer-run-02":{
+					"frame": {"x":0,"y":58,"w":20,"h":25},
+					"size": {"w":50,"h":37},
+					"offset": {"x":16,"y":11}
+				},
+				"adventurer-run-03":{
+					"frame": {"x":0,"y":30,"w":23,"h":28},
+					"size": {"w":50,"h":37},
+					"offset": {"x":17,"y":8}
+				},
+				"adventurer-run-04":{
+					"frame": {"x":40,"y":56,"w":20,"h":27},
+					"size": {"w":50,"h":37},
+					"offset": {"x":16,"y":9}
+				},
+				"adventurer-run-05":{
+					"frame": {"x":20,"y":58,"w":20,"h":25},
+					"size": {"w":50,"h":37},
+					"offset": {"x":16,"y":11}
+				}
+			}
+		}
+	],
+
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"dataformat": "monogame-extended",
+		"version": "1.2",
+		"smartupdate": "$TexturePacker:SmartUpdate:c8fa48701e0784f1e78f047f34e9f081:fa25ce13f3a4bfdfdce15ea777984caf:4f2574c086f57fbc720c03474a3ae1ff$"
+	}
+}

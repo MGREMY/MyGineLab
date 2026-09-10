@@ -28,3 +28,22 @@
 /processorParam:Version=6.1.1.0
 /build:map/world.ldtk
 
+#begin texture/player/player-texture.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/processorParam:Version=3.8.5.1
+/build:texture/player/player-texture.png
+
+#begin texture/player/player.json
+/importer:TexturePackerJsonImporter
+/processor:TexturePackerProcessor
+/processorParam:Version=6.1.1.0
+/build:texture/player/player.json
+

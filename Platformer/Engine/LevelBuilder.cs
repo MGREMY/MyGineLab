@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -23,25 +25,25 @@ public static class LevelBuilder
         string levelPath,
         ContentManager content,
         LevelProperties properties,
-        GraphicsDevice graphicsDevice,
         World ecs,
         CollisionWorld2D collisions)
     {
         var tilemap = content.Load<Tilemap>(levelPath);
 
-        return Build(tilemap, properties, graphicsDevice, ecs, collisions);
+        return Build(tilemap, content, properties, ecs, collisions);
     }
 
     public static LevelData Build(
         Tilemap tilemap,
+        ContentManager content,
         LevelProperties properties,
-        GraphicsDevice graphicsDevice,
         World ecs,
         CollisionWorld2D collisions)
     {
         var wallActors = CreateCollisions(tilemap, properties).Select(x => new WallActor(_nextId++, x)).ToArray();
         var spawn = CreateSpawnPoint(tilemap, properties);
-        var entities = CreateEntities(tilemap, properties, graphicsDevice, ecs, collisions, spawn);
+        var player = CreatePlayer(content, properties, ecs, collisions, spawn);
+        var entities = CreateEntities(tilemap, properties, ecs, collisions);
 
         var renderer = new TilemapSpriteBatchRenderer
         {
@@ -56,7 +58,7 @@ public static class LevelBuilder
             Tilemap = tilemap,
             Renderer = renderer,
             Walls = wallActors,
-            EntityIds = [.. entities.Select(x => x.Id)],
+            EntityIds = [player.Id, .. entities.Select(x => x.Id)],
             SpawnPoint = spawn,
             SizePx = tilemap.TileToWorldPosition(tilemap.Width, tilemap.Height),
         };
@@ -179,10 +181,9 @@ public static class LevelBuilder
         return Vector2.Zero;
     }
 
-    private static IEnumerable<Entity> CreateEntities(
-        Tilemap map,
+    private static Entity CreatePlayer(
+        ContentManager content,
         LevelProperties properties,
-        GraphicsDevice graphicsDevice,
         World ecs,
         CollisionWorld2D collisions,
         Vector2 spawnPoint)
@@ -195,9 +196,20 @@ public static class LevelBuilder
         player.Attach(new Transform2Component { Position = spawnPoint, Size = playerSize });
         player.Attach(new VelocityComponent());
         player.Attach(CreateCollider(collisions, spawnPoint, playerSize, properties.CollisionPlayerLayer));
-        player.Attach(new Sprite(TextureHelper.CreateFromSize(graphicsDevice, playerSize.ToPoint(), Color.White)));
+        player.Attach(
+            new SpriteComponent(
+                SpriteHelper.CreateAnimatedSprite(content, Path.Combine("texture", "player", "player"))));
 
-        yield return player;
+        return player;
+    }
+
+    private static IEnumerable<Entity> CreateEntities(
+        Tilemap map,
+        LevelProperties properties,
+        World ecs,
+        CollisionWorld2D collisions)
+    {
+        return [];
     }
 
     private static ColliderComponent CreateCollider(
