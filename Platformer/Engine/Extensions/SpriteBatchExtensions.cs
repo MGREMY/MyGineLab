@@ -66,6 +66,11 @@ public static class SpriteBatchExtensions
             }
         }
 
+        /// <summary>
+        /// Draws a sprite inside a designated rectangle, stretching the texture inside.
+        /// </summary>
+        /// <param name="sprite">The sprite to draw.</param>
+        /// <param name="bounds">The bounds where the sprite must be drawn.</param>
         public void DrawInsideStretch(Sprite sprite, RectangleF bounds)
         {
             var region = sprite.TextureRegion;

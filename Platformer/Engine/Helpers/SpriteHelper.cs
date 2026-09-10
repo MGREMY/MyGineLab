@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Microsoft.Xna.Framework.Content;
 using MonoGame.Extended.Graphics;
 
@@ -13,25 +14,21 @@ public static class SpriteHelper
 
         var animationSpeed = TimeSpan.FromSeconds(0.3);
 
-        spriteSheet.DefineAnimation("idle", builder =>
-        {
-            builder.IsLooping(true)
-                .AddFrame("adventurer-idle-00", animationSpeed)
-                .AddFrame("adventurer-idle-01", animationSpeed)
-                .AddFrame("adventurer-idle-02", animationSpeed);
-        });
+        var groupedNames = StringHelper.GroupByCommonPrefix('~', [.. atlas.Select(x => x.Name)]);
 
-        spriteSheet.DefineAnimation("run", builder =>
+        foreach (var (key, regionNames) in groupedNames)
         {
-            builder.IsLooping(true)
-                .AddFrame("adventurer-run-00", animationSpeed)
-                .AddFrame("adventurer-run-01", animationSpeed)
-                .AddFrame("adventurer-run-02", animationSpeed)
-                .AddFrame("adventurer-run-03", animationSpeed)
-                .AddFrame("adventurer-run-04", animationSpeed)
-                .AddFrame("adventurer-run-05", animationSpeed);
-        });
+            spriteSheet.DefineAnimation(key, builder =>
+            {
+                builder.IsLooping(true);
 
-        return new AnimatedSprite(spriteSheet, "idle");
+                foreach (var regionName in regionNames)
+                {
+                    builder.AddFrame(regionName, animationSpeed);
+                }
+            });
+        }
+
+        return new AnimatedSprite(spriteSheet, groupedNames.First().Key);
     }
 }
