@@ -14,7 +14,6 @@ namespace Platformer.Engine.Ecs.Systems;
 /// </summary>
 public class RenderSystem : EntityDrawSystem
 {
-    private readonly LevelProperties _properties;
     private readonly SpriteBatch _spriteBatch;
     private readonly OrthographicCamera _camera;
 
@@ -24,13 +23,11 @@ public class RenderSystem : EntityDrawSystem
     /// <summary>
     /// Initializes a new instance of the render system.
     /// </summary>
-    /// <param name="properties">The properties of the level.</param>
     /// <param name="spriteBatch">The sprite batch used to render the entities.</param>
     /// <param name="camera">The camera used to transform the drawing.</param>
-    public RenderSystem(LevelProperties properties, SpriteBatch spriteBatch, OrthographicCamera camera) : base(
+    public RenderSystem(SpriteBatch spriteBatch, OrthographicCamera camera) : base(
         Aspect.All(typeof(Transform2Component), typeof(SpriteComponent)))
     {
-        _properties = properties;
         _spriteBatch = spriteBatch;
         _camera = camera;
     }

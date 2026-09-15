@@ -3,6 +3,7 @@ using MonoGame.Extended.Collisions;
 using MonoGame.Extended.ECS;
 using MonoGame.Extended.ECS.Systems;
 using Platformer.Engine.Ecs.Components;
+using Platformer.GameObjects;
 
 namespace Platformer.Engine.Ecs.Systems;
 
@@ -12,7 +13,6 @@ namespace Platformer.Engine.Ecs.Systems;
 /// </summary>
 public class CollisionQuerySystem : EntityUpdateSystem
 {
-    private readonly LevelProperties _properties;
     private readonly CollisionWorld2D _collisions;
 
     private ComponentMapper<ColliderComponent> _colliderComponentMapper = null!;
@@ -20,12 +20,10 @@ public class CollisionQuerySystem : EntityUpdateSystem
     /// <summary>
     /// Initializes a new instance of the collision query system.
     /// </summary>
-    /// <param name="properties">The properties of the level.</param>
     /// <param name="collisions">The collision world to query.</param>
-    public CollisionQuerySystem(LevelProperties properties, CollisionWorld2D collisions) : base(
+    public CollisionQuerySystem(CollisionWorld2D collisions) : base(
         Aspect.All(typeof(ColliderComponent)))
     {
-        _properties = properties;
         _collisions = collisions;
     }
 
@@ -48,7 +46,7 @@ public class CollisionQuerySystem : EntityUpdateSystem
         {
             var colliderComponent = _colliderComponentMapper.Get(entityId);
 
-            var collisions = _collisions.QueryCollisions(colliderComponent, _properties.CollisionWallLayer);
+            var collisions = _collisions.QueryCollisions(colliderComponent, LevelConstants.WallLayer);
             colliderComponent.LastFrameCollisions = [.. collisions];
         }
     }

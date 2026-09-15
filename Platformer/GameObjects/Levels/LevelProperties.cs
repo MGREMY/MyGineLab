@@ -1,42 +1,10 @@
 using Microsoft.Xna.Framework;
+using MonoGame.Extended.Tilemaps;
 
-namespace Platformer.Engine;
+namespace Platformer.GameObjects.Levels;
 
-/// <summary>
-/// Holds the tunable properties of a level, loaded from the level's map
-/// properties with <see cref="Constants"/> values as fallbacks.
-/// </summary>
 public class LevelProperties
 {
-    // Engine/Map properties, immutable
-
-    /// <summary>
-    /// Gets the name of the collision layer used for walls.
-    /// </summary>
-    public string CollisionWallLayer => Constants.WallLayer;
-
-    /// <summary>
-    /// Gets the name of the collision layer used for players.
-    /// </summary>
-    public string CollisionPlayerLayer => Constants.PlayerLayer;
-
-    /// <summary>
-    /// Gets the name of the tilemap layer describing the walls of the level.
-    /// </summary>
-    public string TilemapWallLayer => Constants.TilemapWallLayer;
-
-    /// <summary>
-    /// Gets the name of the tilemap data layer.
-    /// </summary>
-    public string TilemapDataLayer => Constants.TilemapDataLayer;
-
-    /// <summary>
-    /// Gets the name of the data-layer object describing the spawn point.
-    /// </summary>
-    public string TilemapDataDefinitionSpawnPoint => Constants.TilemapDataDefinitionSpawnPoint;
-
-    // Level properties, mutable
-
     /// <summary>
     /// Gets or sets the size of the virtual camera viewport in pixels.
     /// </summary>
@@ -83,4 +51,28 @@ public class LevelProperties
     /// Gets or sets the maximum falling speed of the player, in pixels per second.
     /// </summary>
     public required float MaxFallSpeed { get; set; }
+
+    private LevelProperties()
+    {
+    }
+
+    public static LevelProperties ParseFromTilemap(Tilemap map)
+    {
+        return new LevelProperties
+        {
+            VirtualCameraSize = new Point(
+                map.Properties.GetInt("VirtualCameraWidth", LevelConstants.CameraWidth),
+                map.Properties.GetInt("VirtualCameraHeight", LevelConstants.CameraHeight)),
+            PlayerSize = new Vector2(
+                map.Properties.GetFloat("PlayerWidth", LevelConstants.PlayerWidth),
+                map.Properties.GetFloat("PlayerHeight", LevelConstants.PlayerHeight)),
+            Gravity = map.Properties.GetFloat("Gravity", LevelConstants.Gravity),
+            GravityScale = map.Properties.GetFloat("GravityScale", LevelConstants.GravityScale),
+            MoveAcceleration = map.Properties.GetFloat("MoveAcceleration", LevelConstants.MoveAcceleration),
+            WalkSpeed = map.Properties.GetFloat("WalkSpeed", LevelConstants.WalkSpeed),
+            JumpSpeed = map.Properties.GetFloat("JumpSpeed", LevelConstants.JumpSpeed),
+            WallSlideSpeed = map.Properties.GetFloat("WallSlideSpeed", LevelConstants.WallSlideSpeed),
+            MaxFallSpeed = map.Properties.GetFloat("MaxFallSpeed", LevelConstants.MaxFallSpeed),
+        };
+    }
 }

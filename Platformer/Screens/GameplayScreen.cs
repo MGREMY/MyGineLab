@@ -3,7 +3,8 @@ using Core;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tilemaps;
-using Platformer.Engine;
+using Platformer.Engine.Helpers;
+using Platformer.GameObjects.Worlds;
 
 namespace Platformer.Screens;
 
@@ -22,11 +23,11 @@ public class GameplayScreen(BaseGame game) : BaseScreen(game)
     {
         base.LoadContent();
 
-        var font = Content.Load<SpriteFont>(Path.Combine("fonts", "roboto"));
+        var playerSprite = SpriteHelper.CreateAnimatedSprite(Content, Path.Combine("texture", "player", "player"));
         var tilemapWorld = Content.Load<TilemapWorld>(Path.Combine("map", "world"));
 
-        _gameWorld = new GameWorld(tilemapWorld, font);
-        _gameWorld.LoadLevel(0, Window, GraphicsDevice, Content, SpriteBatch);
+        _gameWorld = new GameWorld(tilemapWorld, playerSprite, Window, GraphicsDevice, SpriteBatch);
+        _gameWorld.LoadLevel(0);
     }
 
     /// <summary>
@@ -46,6 +47,6 @@ public class GameplayScreen(BaseGame game) : BaseScreen(game)
     {
         GraphicsDevice.Clear(_gameWorld.ActiveLevel?.Tilemap.BackgroundColor ?? Color.Black);
 
-        _gameWorld.Draw(gameTime, SpriteBatch);
+        _gameWorld.Draw(gameTime);
     }
 }

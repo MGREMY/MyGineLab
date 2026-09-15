@@ -1,39 +1,7 @@
-using Microsoft.Xna.Framework;
+namespace Platformer.GameObjects;
 
-namespace Platformer.Engine;
-
-/// <summary>
-/// Defines the default constants used by the engine and the fallback values for
-/// the per-level properties.
-/// </summary>
-public class Constants
+public class LevelConstants
 {
-    // Engine dependencies
-    /// <summary>
-    /// Gets the name of the tilemap data layer.
-    /// </summary>
-    public const string TilemapDataLayer = "MapData";
-
-    /// <summary>
-    /// Gets the name of the tilemap layer describing the walls of the level.
-    /// </summary>
-    public const string TilemapWallLayer = "Walls";
-
-    /// <summary>
-    /// Gets the name of the data-layer object describing the spawn point.
-    /// </summary>
-    public const string TilemapDataDefinitionSpawnPoint = "SpawnPoint";
-
-    /// <summary>
-    /// Gets the size, in pixels, of the player used by the tilemap data.
-    /// </summary>
-    public static Vector2 TilemapDataPlayerSize { get; } = new(16);
-
-    /// <summary>
-    /// Gets the default gravity scale applied to the player.
-    /// </summary>
-    public const float TilemapDataPlayerGravityScale = 1.0f;
-
     /// <summary>
     /// Gets the default name of the collision layer used for walls.
     /// </summary>
