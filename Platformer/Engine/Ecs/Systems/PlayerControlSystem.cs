@@ -1,5 +1,4 @@
 using System;
-using System.Reflection.Metadata;
 using Core.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -25,6 +24,7 @@ public class PlayerControlSystem : EntityUpdateSystem
 
     private ComponentMapper<PlayerComponent> _playerComponentMapper = null!;
     private ComponentMapper<VelocityComponent> _velocityComponentMapper = null!;
+    private ComponentMapper<ColliderComponent> _colliderComponentMapper = null!;
 
     /// <summary>
     /// Initializes a new instance of the player control system.
@@ -41,6 +41,7 @@ public class PlayerControlSystem : EntityUpdateSystem
     {
         _playerComponentMapper = mapperService.GetMapper<PlayerComponent>();
         _velocityComponentMapper = mapperService.GetMapper<VelocityComponent>();
+        _colliderComponentMapper = mapperService.GetMapper<ColliderComponent>();
     }
 
     /// <summary>
@@ -74,6 +75,14 @@ public class PlayerControlSystem : EntityUpdateSystem
             if (playerComponent.CanJump
                 && InputManager.Instance.Keyboard.WasKeyJustPressed(Keys.Space))
             {
+                var colliderComponent = _colliderComponentMapper.Get(entityId);
+                var mtv = colliderComponent.Mtv;
+
+                if (mtv.X is not 0)
+                {
+                    velocityComponent.Value.X = Math.Sign(mtv.X) * _properties.WalkSpeed;
+                }
+
                 velocityComponent.Value.Y = -_properties.JumpSpeed;
 
                 if (playerComponent.IsJumping) playerComponent.CanJump = false;

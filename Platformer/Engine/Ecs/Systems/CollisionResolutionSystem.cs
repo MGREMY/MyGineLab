@@ -51,87 +51,76 @@ public class CollisionResolutionSystem : EntityUpdateSystem
         {
             var colliderComponent = _colliderComponentMapper.Get(entityId);
             var transformComponent = _transformComponentMapper.Get(entityId);
+            var mtv = colliderComponent.Mtv;
 
-            var mtv = Vector2.Zero;
+            if (mtv == Vector2.Zero) continue;
 
-            foreach (var collisionEvent in colliderComponent.LastFrameCollisions)
+            transformComponent.Position += mtv;
+
+            if (!_velocityComponentMapper.TryGet(entityId, out var velocityComponent)) continue;
+
+            var playerComponentExists =
+                _playerComponentMapper.TryGet(entityId, out PlayerComponent? playerComponent);
+
+            // on ground
+            if (mtv.Y < 0)
             {
-                if (Math.Abs(collisionEvent.Result.MinimumTranslationVector.X) > Math.Abs(mtv.X))
-                    mtv.X = collisionEvent.Result.MinimumTranslationVector.X;
-                if (Math.Abs(collisionEvent.Result.MinimumTranslationVector.Y) > Math.Abs(mtv.Y))
-                    mtv.Y = collisionEvent.Result.MinimumTranslationVector.Y;
+                if (playerComponentExists)
+                {
+                    playerComponent.OnGround = true;
+                    playerComponent.CanJump = true;
+                    playerComponent.IsJumping = false;
+                }
+
+                velocityComponent.Value.Y = 0;
+                velocityComponent.Target.Y = 0;
+            }
+            else if (playerComponentExists)
+            {
+                playerComponent.OnGround = false;
             }
 
-            if (mtv != Vector2.Zero)
+            // on ceiling
+            if (mtv.Y > 0)
             {
-                transformComponent.Position += mtv;
+                if (playerComponentExists) playerComponent.OnCeiling = true;
 
-                if (_velocityComponentMapper.TryGet(entityId, out var velocityComponent))
+                velocityComponent.Value.Y = 0;
+                velocityComponent.Target.Y = 0;
+            }
+            else if (playerComponentExists)
+            {
+                playerComponent.OnCeiling = false;
+            }
+
+            // hit a wall
+            if (mtv.X is not 0.0f)
+            {
+                if (playerComponentExists)
                 {
-                    var playerComponentExists =
-                        _playerComponentMapper.TryGet(entityId, out PlayerComponent? playerComponent);
-
-                    // on ground
-                    if (mtv.Y < 0)
-                    {
-                        if (playerComponentExists)
-                        {
-                            playerComponent.OnGround = true;
-                            playerComponent.CanJump = true;
-                            playerComponent.IsJumping = false;
-                        }
-
-                        velocityComponent.Value.Y = 0;
-                        velocityComponent.Target.Y = 0;
-                    }
-                    else if (playerComponentExists)
-                    {
-                        playerComponent.OnGround = false;
-                    }
-
-                    // on ceiling
-                    if (mtv.Y > 0)
-                    {
-                        if (playerComponentExists) playerComponent.OnCeiling = true;
-
-                        velocityComponent.Value.Y = 0;
-                        velocityComponent.Target.Y = 0;
-                    }
-                    else if (playerComponentExists)
-                    {
-                        playerComponent.OnCeiling = false;
-                    }
-
-                    // hit a wall
-                    if (mtv.X is not 0.0f)
-                    {
-                        if (playerComponentExists)
-                        {
-                            playerComponent.OnWall = true;
-                            playerComponent.CanJump = true;
-                            playerComponent.IsJumping = false;
-                        }
-
-                        // if the velocity is going upwards
-                        if (velocityComponent.Value.Y < 0)
-                        {
-                            velocityComponent.Value.Y = 0;
-                            velocityComponent.Target.Y = 0;
-                        }
-                        // if the velocity is going down
-                        else if (velocityComponent.Value.Y > _properties.WallSlideSpeed)
-                        {
-                            velocityComponent.Value.Y = _properties.WallSlideSpeed;
-                        }
-
-                        velocityComponent.Value.X = 0;
-                        velocityComponent.Target.X = 0;
-                    }
-                    else if (playerComponentExists)
-                    {
-                        playerComponent.OnWall = false;
-                    }
+                    playerComponent.OnWall = true;
+                    playerComponent.CanJump = true;
+                    playerComponent.IsJumping = false;
                 }
+
+                // if the velocity is going upwards
+                if (velocityComponent.Value.Y < 0)
+                {
+                    velocityComponent.Value.Y = 0;
+                    velocityComponent.Target.Y = 0;
+                }
+                // if the velocity is going down
+                else if (velocityComponent.Value.Y > _properties.WallSlideSpeed)
+                {
+                    velocityComponent.Value.Y = _properties.WallSlideSpeed;
+                }
+
+                velocityComponent.Value.X = 0;
+                velocityComponent.Target.X = 0;
+            }
+            else if (playerComponentExists)
+            {
+                playerComponent.OnWall = false;
             }
         }
     }

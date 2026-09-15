@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.Xna.Framework;
 using MonoGame.Extended;
 using MonoGame.Extended.Collisions;
@@ -29,6 +30,10 @@ public class ColliderComponent : ICollisionActor
     /// Gets or sets the collisions this collider detected on the last frame.
     /// </summary>
     public CollisionEvent2D[] LastFrameCollisions;
+
+    public Vector2 Mtv => LastFrameCollisions.Aggregate(
+        Vector2.Zero,
+        (v, ce) => v + ce.Result.MinimumTranslationVector);
 
     /// <summary>
     /// Initializes a new instance of a collider with no layer.
