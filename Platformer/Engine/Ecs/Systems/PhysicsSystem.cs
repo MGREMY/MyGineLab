@@ -12,7 +12,7 @@ namespace Platformer.Engine.Ecs.Systems;
 /// </summary>
 public class PhysicsSystem : EntityUpdateSystem
 {
-    private readonly LevelProperties _properties;
+    private readonly EngineOptions _options;
 
     private ComponentMapper<VelocityComponent> _velocityComponentMapper = null!;
     private ComponentMapper<Transform2Component> _transformComponentMapper = null!;
@@ -20,11 +20,11 @@ public class PhysicsSystem : EntityUpdateSystem
     /// <summary>
     /// Initializes a new instance of the physics system.
     /// </summary>
-    /// <param name="properties">The properties of the level.</param>
-    public PhysicsSystem(LevelProperties properties) : base(Aspect.All(typeof(VelocityComponent),
+    /// <param name="options">The properties of the level.</param>
+    public PhysicsSystem(EngineOptions options) : base(Aspect.All(typeof(VelocityComponent),
         typeof(Transform2Component)))
     {
-        _properties = properties;
+        _options = options;
     }
 
     /// <inheritdoc/>
@@ -50,12 +50,12 @@ public class PhysicsSystem : EntityUpdateSystem
             var transformComponent = _transformComponentMapper.Get(entityId);
 
             // Apply gravity
-            velocityComponent.Value.Y += _properties.GravityScale * _properties.Gravity * deltaTime;
+            velocityComponent.Value.Y += _options.GravityScale * _options.Gravity * deltaTime;
 
             // Clamp the maximum fall speed
             if (velocityComponent.Value.Y > 0.0f)
             {
-                velocityComponent.Value.Y = Math.Min(velocityComponent.Value.Y, _properties.MaxFallSpeed);
+                velocityComponent.Value.Y = Math.Min(velocityComponent.Value.Y, _options.MaxFallSpeed);
             }
 
             // Apply the velocity on the position

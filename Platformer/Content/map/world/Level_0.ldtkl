@@ -26,10 +26,7 @@
 	"__smartColor": "#ADADB5",
 	"__bgPos": null,
 	"externalRelPath": null,
-	"fieldInstances": [
-		{ "__identifier": "VirtualCameraWidth", "__type": "Int", "__value": 640, "__tile": null, "defUid": 54, "realEditorValues": [] },
-		{ "__identifier": "VirtualCameraHeight", "__type": "Int", "__value": 320, "__tile": null, "defUid": 55, "realEditorValues": [] }
-	],
+	"fieldInstances": [],
 	"layerInstances": [
 		{
 			"__identifier": "MapData",

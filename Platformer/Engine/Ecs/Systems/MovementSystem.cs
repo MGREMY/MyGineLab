@@ -13,17 +13,17 @@ namespace Platformer.Engine.Ecs.Systems;
 /// </summary>
 public class MovementSystem : EntityUpdateSystem
 {
-    private readonly LevelProperties _properties;
+    private readonly EngineOptions _options;
 
-    private ComponentMapper<VelocityComponent> _velocityComponentMapper;
+    private ComponentMapper<VelocityComponent> _velocityComponentMapper = null!;
 
     /// <summary>
     /// Initializes a new instance of the movement system.
     /// </summary>
-    /// <param name="properties">The properties of the level.</param>
-    public MovementSystem(LevelProperties properties) : base(Aspect.All(typeof(VelocityComponent)))
+    /// <param name="options">The properties of the level.</param>
+    public MovementSystem(EngineOptions options) : base(Aspect.All(typeof(VelocityComponent)))
     {
-        _properties = properties;
+        _options = options;
     }
 
     /// <inheritdoc/>
@@ -48,7 +48,7 @@ public class MovementSystem : EntityUpdateSystem
             velocityComponent.Value.X = MoveTowards(
                 current: velocityComponent.Value.X,
                 target: velocityComponent.Target.X,
-                amount: _properties.MoveAcceleration * deltaTime);
+                amount: _options.MoveAcceleration * deltaTime);
 
             /*
             velocityComponent.Value = MoveTowards(

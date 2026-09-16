@@ -13,7 +13,7 @@ namespace Platformer.Engine.Ecs.Systems;
 /// </summary>
 public class CollisionResolutionSystem : EntityUpdateSystem
 {
-    private readonly LevelProperties _properties;
+    private readonly EngineOptions _options;
 
     private ComponentMapper<ColliderComponent> _colliderComponentMapper = null!;
     private ComponentMapper<Transform2Component> _transformComponentMapper = null!;
@@ -23,11 +23,11 @@ public class CollisionResolutionSystem : EntityUpdateSystem
     /// <summary>
     /// Initializes a new instance of the collision resolution system.
     /// </summary>
-    /// <param name="properties">The properties of the level.</param>
-    public CollisionResolutionSystem(LevelProperties properties) : base(Aspect.All(typeof(ColliderComponent),
+    /// <param name="options">The properties of the level.</param>
+    public CollisionResolutionSystem(EngineOptions options) : base(Aspect.All(typeof(ColliderComponent),
         typeof(Transform2Component)))
     {
-        _properties = properties;
+        _options = options;
     }
 
     /// <inheritdoc/>
@@ -110,9 +110,9 @@ public class CollisionResolutionSystem : EntityUpdateSystem
                     velocityComponent.Target.Y = 0;
                 }
                 // if the velocity is going down
-                else if (velocityComponent.Value.Y > _properties.WallSlideSpeed)
+                else if (velocityComponent.Value.Y > _options.WallSlideSpeed)
                 {
-                    velocityComponent.Value.Y = _properties.WallSlideSpeed;
+                    velocityComponent.Value.Y = _options.WallSlideSpeed;
                 }
 
                 velocityComponent.Value.X = 0;

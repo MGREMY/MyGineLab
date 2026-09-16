@@ -46,7 +46,7 @@ public class CollisionQuerySystem : EntityUpdateSystem
         {
             var colliderComponent = _colliderComponentMapper.Get(entityId);
 
-            var collisions = _collisions.QueryCollisions(colliderComponent, LevelConstants.WallLayer);
+            var collisions = _collisions.QueryCollisions(colliderComponent, Constants.LevelCollisionsLayerWallName);
             colliderComponent.LastFrameCollisions = [.. collisions];
         }
     }

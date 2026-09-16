@@ -21,7 +21,7 @@ namespace Platformer.Engine.Ecs.Systems;
 /// </remarks>
 public class PlayerControlSystem : EntityUpdateSystem
 {
-    private readonly LevelProperties _properties;
+    private readonly EngineOptions _options;
 
     private ComponentMapper<PlayerComponent> _playerComponentMapper = null!;
     private ComponentMapper<VelocityComponent> _velocityComponentMapper = null!;
@@ -30,11 +30,11 @@ public class PlayerControlSystem : EntityUpdateSystem
     /// <summary>
     /// Initializes a new instance of the player control system.
     /// </summary>
-    /// <param name="properties">The properties of the level.</param>
-    public PlayerControlSystem(LevelProperties properties) : base(Aspect.All(typeof(PlayerComponent),
+    /// <param name="options">The properties of the level.</param>
+    public PlayerControlSystem(EngineOptions options) : base(Aspect.All(typeof(PlayerComponent),
         typeof(VelocityComponent)))
     {
-        _properties = properties;
+        _options = options;
     }
 
     /// <inheritdoc/>
@@ -61,15 +61,15 @@ public class PlayerControlSystem : EntityUpdateSystem
 
             if (InputManager.Instance.Keyboard.IsKeyDown(Keys.Q))
             {
-                velocityComponent.Target.X = Math.Clamp(velocityComponent.Target.X - _properties.WalkSpeed,
-                    -_properties.WalkSpeed, _properties.WalkSpeed);
+                velocityComponent.Target.X = Math.Clamp(velocityComponent.Target.X - _options.WalkSpeed,
+                    -_options.WalkSpeed, _options.WalkSpeed);
             }
             else if (velocityComponent.Target.X < 0) velocityComponent.Target.X = 0;
 
             if (InputManager.Instance.Keyboard.IsKeyDown(Keys.D))
             {
-                velocityComponent.Target.X = Math.Clamp(velocityComponent.Target.X + _properties.WalkSpeed,
-                    -_properties.WalkSpeed, _properties.WalkSpeed);
+                velocityComponent.Target.X = Math.Clamp(velocityComponent.Target.X + _options.WalkSpeed,
+                    -_options.WalkSpeed, _options.WalkSpeed);
             }
             else if (velocityComponent.Target.X > 0) velocityComponent.Target.X = 0;
 
@@ -81,10 +81,10 @@ public class PlayerControlSystem : EntityUpdateSystem
 
                 if (mtv.X is not 0)
                 {
-                    velocityComponent.Value.X = Math.Sign(mtv.X) * _properties.WalkSpeed;
+                    velocityComponent.Value.X = Math.Sign(mtv.X) * _options.WalkSpeed;
                 }
 
-                velocityComponent.Value.Y = -_properties.JumpSpeed;
+                velocityComponent.Value.Y = -_options.JumpSpeed;
 
                 if (playerComponent.IsJumping) playerComponent.CanJump = false;
 

@@ -12,7 +12,7 @@ public class Game1 : BaseGame
     /// <summary>
     /// Gets the screen manager that owns and transitions between game screens.
     /// </summary>
-    public ScreenManager ScreenManager { get; } = new();
+    public static ScreenManager ScreenManager { get; } = new();
 
     /// <summary>
     /// Initializes a new instance of the game and registers the <see cref="ScreenManager"/>
