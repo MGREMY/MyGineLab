@@ -7,9 +7,8 @@ using MonoGame.Extended.Screens;
 using MonoGame.Extended.Tilemaps;
 using MonoGame.Extended.Tilemaps.Rendering;
 using MonoGame.Extended.ViewportAdapters;
-using Platformer.Engine.Helpers;
-using Platformer.GameObjects;
 using Platformer.GameObjects.Levels;
+using Platformer.Helpers;
 
 namespace Platformer.Screens;
 
@@ -32,6 +31,8 @@ public class GameplayScreen(Game game) : GameScreen(game)
             virtualWidth: 640,
             virtualHeight: 320);
 
+        _spriteBatch = new SpriteBatch(GraphicsDevice);
+
         _renderer = new TilemapSpriteBatchRenderer
         {
             BlendState = BlendState.AlphaBlend,
@@ -46,8 +47,6 @@ public class GameplayScreen(Game game) : GameScreen(game)
     {
         base.LoadContent();
 
-        _spriteBatch = new SpriteBatch(GraphicsDevice);
-
         _playerSprite = SpriteHelper.CreateAnimatedSprite(Content, Path.Combine("texture", "player", "player"));
         _map = Content.Load<TilemapWorld>(Path.Combine("map", "world")).Levels[0];
         _level = new GameLevel(_map, _camera, _spriteBatch);
@@ -57,7 +56,7 @@ public class GameplayScreen(Game game) : GameScreen(game)
 
         _renderer.LoadTilemap(_map);
 
-        _level.AddPlayer(_level.LevelProperties.SpawnPoint[0], _playerSprite);
+        _level.AddPlayer(_level.LevelProperties.SpawnPoint, _playerSprite);
     }
 
     /// <summary>

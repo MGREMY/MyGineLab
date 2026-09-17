@@ -2,8 +2,9 @@ using System;
 using System.Linq;
 using Microsoft.Xna.Framework.Content;
 using MonoGame.Extended.Graphics;
+using Platformer.Engine.Helpers;
 
-namespace Platformer.Engine.Helpers;
+namespace Platformer.Helpers;
 
 /// <summary>
 /// Provides helpers used to build sprites out of texture atlas assets.

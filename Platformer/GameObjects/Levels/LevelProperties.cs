@@ -4,13 +4,14 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using MonoGame.Extended.Tilemaps;
 using Platformer.Engine;
+using Platformer.Extensions;
 
 namespace Platformer.GameObjects.Levels;
 
 public class LevelProperties
 {
     public EngineOptions Options { get; }
-    public Vector2[] SpawnPoint { get; }
+    public Vector2 SpawnPoint { get; }
 
     public LevelProperties(Tilemap map)
     {
@@ -24,9 +25,9 @@ public class LevelProperties
                 $"The layer {Constants.LDtkLayerDataName} is required when loading an LDtk map.");
         }
 
-        if (dataLayer.GetObjects<TilemapObject>() is not { } sps)
+        if (dataLayer.GetObjects<TilemapObject>(Constants.SpawnPointKey) is not { } sps)
             throw new ContentLoadException($"Spawn point is required in {Constants.LDtkLayerDataName} layer.");
 
-        SpawnPoint = [.. sps.Select(x => x.Position)];
+        SpawnPoint = sps.Select(x => x.Position).First();
     }
 }

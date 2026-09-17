@@ -81,7 +81,7 @@ public class PlayerControlSystem : EntityUpdateSystem
 
                 if (mtv.X is not 0)
                 {
-                    velocityComponent.Value.X = Math.Sign(mtv.X) * _options.WalkSpeed;
+                    velocityComponent.Value.X = Math.Sign(mtv.X) * _options.WalkSpeed * 0.5f;
                 }
 
                 velocityComponent.Value.Y = -_options.JumpSpeed;

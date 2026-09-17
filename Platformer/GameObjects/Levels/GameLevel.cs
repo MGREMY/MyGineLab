@@ -16,16 +16,18 @@ public class GameLevel
 {
     public readonly LevelProperties LevelProperties;
 
-    private int _entityCount;
     private readonly CollisionWorld2D _collisions;
     private readonly World _ecs;
+    private int _entityCount;
 
     public GameLevel(
         Tilemap map,
         OrthographicCamera camera,
-        SpriteBatch spriteBatch)
+        SpriteBatch spriteBatch,
+        LevelProperties? levelProperties = null)
     {
-        LevelProperties = new LevelProperties(map);
+        LevelProperties = levelProperties ?? new LevelProperties(map);
+
         _collisions = new CollisionWorld2D();
         _ecs = new WorldBuilder()
             .AddSystem(new PlayerControlSystem(LevelProperties.Options))

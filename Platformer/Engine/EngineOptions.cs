@@ -51,7 +51,7 @@ public class EngineOptions
     {
     }
 
-    public static EngineOptions Default = new EngineOptions
+    public static readonly EngineOptions Default = new()
     {
         PlayerSize = new Vector2(16, 16),
         Gravity = 800f,

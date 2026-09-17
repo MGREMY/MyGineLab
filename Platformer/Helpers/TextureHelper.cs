@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Platformer.Engine.Helpers;
+namespace Platformer.Helpers;
 
 /// <summary>
 /// Provides helpers used to create procedural textures.

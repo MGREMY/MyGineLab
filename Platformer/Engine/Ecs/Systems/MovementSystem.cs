@@ -50,27 +50,10 @@ public class MovementSystem : EntityUpdateSystem
                 target: velocityComponent.Target.X,
                 amount: _options.MoveAcceleration * deltaTime);
 
-            /*
-            velocityComponent.Value = MoveTowards(
-                current: velocityComponent.Value,
-                target: velocityComponent.Target,
-                amount: Constants.MovementSpeed * deltaTime);
-            */
-
             if (Math.Abs(velocityComponent.Value.X) <= 1f)
                 velocityComponent.Value.X = 0.0f;
-
-            /*
-            if (Math.Abs(velocityComponent.Value.Y) <= 1f)
-                velocityComponent.Value.Y = 0.0f;
-            */
         }
     }
-
-    /*
-    private Vector2 MoveTowards(Vector2 current, Vector2 target, float amount) =>
-        new(MoveTowards(current.X, target.X, amount), MoveTowards(current.Y, target.Y, amount));
-    */
 
     private float MoveTowards(float current, float target, float amount)
     {
