@@ -19,6 +19,7 @@ public class RenderSystem : EntityDrawSystem
 
     private ComponentMapper<Transform2Component> _transformComponentMapper = null!;
     private ComponentMapper<SpriteComponent> _spriteComponentMapper = null!;
+    private ComponentMapper<VelocityComponent> _velocityComponentMapper = null!;
 
     /// <summary>
     /// Initializes a new instance of the render system.
@@ -37,6 +38,7 @@ public class RenderSystem : EntityDrawSystem
     {
         _transformComponentMapper = mapperService.GetMapper<Transform2Component>();
         _spriteComponentMapper = mapperService.GetMapper<SpriteComponent>();
+        _velocityComponentMapper = mapperService.GetMapper<VelocityComponent>();
     }
 
     /// <summary>
@@ -46,7 +48,7 @@ public class RenderSystem : EntityDrawSystem
     /// <param name="gameTime">The game time elapsed since the last update.</param>
     public override void Draw(GameTime gameTime)
     {
-        _spriteBatch.Begin(transformMatrix: _camera.GetViewMatrix());
+        _spriteBatch.Begin(transformMatrix: _camera.GetViewMatrix(), samplerState: SamplerState.PointClamp);
 
         foreach (var entityId in ActiveEntities)
         {
@@ -59,7 +61,15 @@ public class RenderSystem : EntityDrawSystem
                     position: transformComponent.Position,
                     size: transformComponent.Size);
 
-                _spriteBatch.DrawInsideStretch(spriteComponent.Sprite, bounds);
+                if (_velocityComponentMapper.TryGet(entityId, out var velocityComponent)
+                    && velocityComponent.Value.X < 0)
+                {
+                    _spriteBatch.DrawInsideStretch(spriteComponent.Sprite, bounds, SpriteEffects.FlipHorizontally);
+                }
+                else
+                {
+                    _spriteBatch.DrawInsideStretch(spriteComponent.Sprite, bounds);
+                }
             }
         }
 

@@ -78,7 +78,8 @@ public static class SpriteBatchExtensions
         /// </summary>
         /// <param name="sprite">The sprite to draw.</param>
         /// <param name="bounds">The bounds the sprite must fill.</param>
-        public void DrawInsideStretch(Sprite sprite, RectangleF bounds)
+        /// <param name="effects">The effects applied to the sprite.</param>
+        public void DrawInsideStretch(Sprite sprite, RectangleF bounds, SpriteEffects effects = SpriteEffects.None)
         {
             var region = sprite.TextureRegion;
             var color = sprite.Color * sprite.Alpha;
@@ -97,7 +98,7 @@ public static class SpriteBatchExtensions
                     rotation: -MathHelper.PiOver2,
                     origin: new Vector2(region.Width - 1, 0),
                     scale: new Vector2(bounds.Height / frameHeight, bounds.Width / frameWidth),
-                    effects: SpriteEffects.None,
+                    effects: effects,
                     layerDepth: 1.0f);
             }
             else
@@ -110,7 +111,7 @@ public static class SpriteBatchExtensions
                     rotation: 0f,
                     origin: Vector2.Zero,
                     scale: new Vector2(bounds.Width / region.Width, bounds.Height / region.Height),
-                    effects: SpriteEffects.None,
+                    effects: effects,
                     layerDepth: 0f);
             }
         }

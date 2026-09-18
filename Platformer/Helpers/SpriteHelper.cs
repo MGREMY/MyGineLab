@@ -49,6 +49,6 @@ public static class SpriteHelper
             });
         }
 
-        return new AnimatedSprite(spriteSheet, groupedNames.First().Key);
+        return new AnimatedSprite(spriteSheet, "player-idle");
     }
 }

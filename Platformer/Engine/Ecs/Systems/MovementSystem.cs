@@ -16,6 +16,7 @@ public class MovementSystem : EntityUpdateSystem
     private readonly EngineOptions _options;
 
     private ComponentMapper<VelocityComponent> _velocityComponentMapper = null!;
+    private ComponentMapper<SpriteComponent> _spriteComponentMapper = null!;
 
     /// <summary>
     /// Initializes a new instance of the movement system.
@@ -30,6 +31,7 @@ public class MovementSystem : EntityUpdateSystem
     public override void Initialize(IComponentMapperService mapperService)
     {
         _velocityComponentMapper = mapperService.GetMapper<VelocityComponent>();
+        _spriteComponentMapper = mapperService.GetMapper<SpriteComponent>();
     }
 
     /// <summary>
@@ -51,7 +53,18 @@ public class MovementSystem : EntityUpdateSystem
                 amount: _options.MoveAcceleration * deltaTime);
 
             if (Math.Abs(velocityComponent.Value.X) <= 1f)
+            {
+                if (_spriteComponentMapper.TryGet(entityId, out var spriteComponent))
+                {
+                    spriteComponent.ChangeAnimation("player-idle");
+                }
+
                 velocityComponent.Value.X = 0.0f;
+            }
+            else if (_spriteComponentMapper.TryGet(entityId, out var spriteComponent))
+            {
+                spriteComponent.ChangeAnimation("player-run");
+            }
         }
     }
 

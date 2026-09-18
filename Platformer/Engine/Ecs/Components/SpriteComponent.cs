@@ -50,4 +50,12 @@ public class SpriteComponent
     {
         if (Sprite is AnimatedSprite animatedSprite) animatedSprite.Update(gameTime);
     }
+
+    public void ChangeAnimation(string name)
+    {
+        if (Sprite is AnimatedSprite animatedSprite && animatedSprite.CurrentAnimation != name)
+        {
+            animatedSprite.SetAnimation(name);
+        }
+    }
 }
