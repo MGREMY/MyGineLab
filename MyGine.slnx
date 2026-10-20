@@ -1,4 +1,6 @@
 <Solution>
   <Project Path="Core/Core.csproj" />
+  <Project Path="MyGine.Game/MyGine.Game.csproj" />
+  <Project Path="MyGine/MyGine.csproj" />
   <Project Path="Platformer\Platformer.csproj" />
 </Solution>

@@ -1,0 +1,36 @@
+{
+	"textures": [
+		{
+			"filename": "player-texture.png",
+			"format": "RGBA8888",
+			"size": {"w":28,"h":58},
+			"frames": {
+				"player-idle~0001":{
+					"frame": {"x":0,"y":38,"w":12,"h":20}
+				},
+				"player-idle~0002":{
+					"frame": {"x":0,"y":0,"w":12,"h":19}
+				},
+				"player-run~0001":{
+					"frame": {"x":12,"y":38,"w":13,"h":20}
+				},
+				"player-run~0002":{
+					"frame": {"x":12,"y":0,"w":16,"h":19}
+				},
+				"player-run~0003":{
+					"frame": {"x":0,"y":19,"w":16,"h":19}
+				},
+				"player-run~0004":{
+					"frame": {"x":16,"y":19,"w":12,"h":19}
+				}
+			}
+		}
+	],
+
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"dataformat": "monogame-extended",
+		"version": "1.2",
+		"smartupdate": "$TexturePacker:SmartUpdate:c23dd09c8bece524baf76af400677e94:91e4a7429731cc86363793898dcea311:4f2574c086f57fbc720c03474a3ae1ff$"
+	}
+}
